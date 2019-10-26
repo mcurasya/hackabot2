@@ -9,7 +9,7 @@ namespace hackabot.Queries
         public override string Alias { get; } = "Boards";
         protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
         {
-            account.Controller.GetBoards();
+            account.Controller.
             return new Response(account, "Here is your boards", account.);
         }
     }
