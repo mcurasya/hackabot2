@@ -18,7 +18,7 @@ namespace hackabot.Commands
                 Name = message.Text,
                 Owner = account
             };
-            return new Response().TextMessage(account, "New board created"); //todo board text + menu 
+            return new Response(prevCommands).TextMessage(account, "New board created"); //todo board text + menu 
         }
     }
 }

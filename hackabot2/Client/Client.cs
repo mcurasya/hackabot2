@@ -15,7 +15,7 @@ namespace hackabot.Client
 {
     public partial class Client
     {
-        public List < (Account, EitherStrict<ICommand, IEnumerable<IOneOfMany>>)> AccountCommandPair = new List<(Account, EitherStrict<ICommand, IEnumerable<IOneOfMany>>)>();
+        public List < (Account, EitherStrict<ICommand, IEnumerable<IOneOfMany>>) > AccountCommandPair = new List < (Account, EitherStrict<ICommand, IEnumerable<IOneOfMany>>) > ();
         public Client(string token, Assembly assembly)
         {
             var baseType = typeof(Query);
