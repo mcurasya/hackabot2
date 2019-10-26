@@ -37,25 +37,6 @@ namespace hackabot.Client
         private TelegramBotClient Bot { get; }
         protected Dictionary<Func<CallbackQuery, Account, bool>, Query> Queries { get; set; }
 
-        //public async void OnUpdateReceived(object sender, UpdateEventArgs e)
-        //{
-        //    if (e.Update.Type == UpdateType.ChannelPost)
-        //    {
-        //        var message    = e.Update.ChannelPost;
-        //        var controller = new TelegramController();
-        //        controller.Start();
-        //        if (message.Document != null || message.Photo != null)
-        //        {
-        //            var meme = await ImageDownloader.DownloadFromMessage(message, this,
-        //                           new ChatId() {ChatId = message.Chat.Id, UserName = message.Chat.Username, Id = -1},
-        //                           controller);
-        //            await EditMessageReplyMarkupAsync(message.Chat, message.MessageId,
-        //                Command.AddMemeButton(controller.GetChannelLanguage(message.Chat.Id), controller, meme.Id,
-        //                    controller.CountLikes(meme.Id)));
-        //        }
-        //    }
-        //}
-
         public async void HandleQuery(CallbackQuery query)
         {
             try
