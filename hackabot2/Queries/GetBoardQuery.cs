@@ -10,16 +10,14 @@ namespace hackabot.Queries
 {
     public class GetBoardQuerry : Query
     {
-        public override string Alias { get; } = "get_board";
+        public override string Alias { get; } = "get_task_list";
         protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
         {
             var boardName = values.First().Value;
             try
             {
                 var board = account.Controller.GetBoards(account).First(t => t.Name == boardName);
-                var text = $@"Board info:
-                             Name: {board.Name}
-                             Owner: {board.Owner.Username}";
+                var text = "Here is your tasks:";
                 return new QuerryResponse().EditMessageMarkup(account, message.Message.MessageId, BoardButton(board)).EditTextMessage(account.ChatId, message.Message.MessageId, text);
             }
             catch (Exception e)
@@ -29,6 +27,7 @@ namespace hackabot.Queries
             }
         }
 
+        //this is with taks, not boards
         public static InlineKeyboardMarkup BoardButton(Board board)
         {
             
@@ -42,7 +41,7 @@ namespace hackabot.Queries
                     new InlineKeyboardButton()
                     {
                         Text = task.Name,
-                        CallbackData = PackParams("get_task", board.Id.ToString(), task.Id.ToString())
+                        CallbackData = PackParams("edit_task", board.Id.ToString(), task.Id.ToString())
                     };
                 if (keys.Count == 0)
                 {

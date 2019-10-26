@@ -18,6 +18,7 @@ namespace hackabot.Commands
                 Name = message.Text,
                 Owner = account
             };
+            account.Controller.SaveChanges();
             return new Response(prevCommands).TextMessage(account, "New board created"); //todo board text + menu 
         }
     }
