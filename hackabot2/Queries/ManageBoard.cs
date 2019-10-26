@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using hackabot.Commands;
 using hackabot.Db.Model;
+using hackabot2.Commands;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -60,8 +62,8 @@ namespace hackabot.Queries
         public override string Alias { get; } = "change_name";
         protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
         {
-            var board = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values.First().Value);
-            throw new NotImplementedException();
+            account.CurrentBoard = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values.First().Value);
+            return new Response(new WaitForBoardNameCommand()).TextMessage(account.ChatId, "Please enter new name");
         }
 
     }
@@ -71,7 +73,7 @@ namespace hackabot.Queries
         protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
         {
             var board = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values.First().Value);
-            throw new NotImplementedException();
+            return new Response(new WaitForTaskNameCommand()).TextMessage(account.ChatId, "Please enter task name");
         }
 
     }

@@ -16,6 +16,8 @@ namespace hackabot.Db.Model
 
         [NotMapped]
         public Board CurrentBoard { get; set; }
+        [NotMapped]
+        public Task CurrentTask { get; set; }
         public static implicit operator ChatId(Account a) => a.ChatId;
 
     }

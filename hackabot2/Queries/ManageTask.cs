@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using hackabot.Commands;
 using hackabot.Db.Model;
+using hackabot2.Commands;
+using Monad.Parsec;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -76,6 +79,18 @@ Status: {task.Status}
                     });
             return buttons;
         }
+        
+    public class ChangeTaskNameQuery : Query
+    {
+        public override string Alias { get; } = "change_name_task";
+        protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
+        {
+            account.CurrentBoard = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values.First().Key);
+            account.CurrentTask = account.Controller.GetTasks(account.CurrentBoard, account).First(t => t.Id.ToString() == values.First().Value);
+            return new Response(new WaitForTaskNameCommand()).TextMessage(account.ChatId, "Please enter new name");
+        }
+
+    }
 
     }
 }
