@@ -60,11 +60,7 @@ namespace BotFramework.Commands
     //todo this
     public class BadInputException : Exception
     {
-        public Response ErrResponse;
-        public BadInputException(string name)
-        {
-            
-        }
+        public readonly Response ErrResponse;
         public BadInputException(Response errResponse)
         {
             ErrResponse = errResponse;

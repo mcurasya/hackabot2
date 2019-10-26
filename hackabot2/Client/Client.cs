@@ -6,6 +6,7 @@ using BotFramework.Commands;
 using BotFramework.Queries;
 using hackabot;
 using Microsoft.EntityFrameworkCore;
+using Monad;
 using StickerMemeDb.Controllers;
 using Telegram.Bot;
 using Telegram.Bot.Args;
@@ -15,18 +16,10 @@ namespace BotFramework.Client
 {
     public partial class Client
     {
+        public List<(Account, EitherStrict<ICommand, IEnumerable<IOneOfMany>>)> AccountCommandPair;
         public Client(string token, Assembly assembly)
         {
-            var baseType = typeof(ICommand);
-
-            Commands = assembly
-                       .GetTypes()
-                       .Where(t => t.IsSubclassOf(baseType) && !t.IsAbstract)
-                       .Select(c => Activator.CreateInstance(c) as IOneOfMany)
-                       .Where(c => c != null)
-                       .ToDictionary(x => new Func<Message, Account, bool>(x.Suitable), x => x);
-
-            baseType = typeof(Query);
+            var baseType = typeof(Query);
             assembly = baseType.Assembly;
 
             Queries = assembly
@@ -43,7 +36,6 @@ namespace BotFramework.Client
         }
 
         private   TelegramBotClient                                     Bot      { get; }
-        protected Dictionary<Func<Message, Account, bool>, ICommand>     Commands { get; set; }
         protected Dictionary<Func<CallbackQuery, Account, bool>, Query> Queries  { get; set; }
 
         //public async void OnUpdateReceived(object sender, UpdateEventArgs e)
@@ -98,6 +90,7 @@ namespace BotFramework.Client
             var     chatId = message.Chat.Id;
             Account account;
 
+            if (AccountCommandPair.Find(t => t.Item1.Chat))
             if (TelegramController.Accounts.ContainsKey(chatId))
             {
                 account = TelegramController.Accounts[chatId];
@@ -118,10 +111,6 @@ namespace BotFramework.Client
             await SendTextMessageAsync(command.Execute(message, this, account));
         }
 
-        protected DbLoggerCategory.Database.Command GetCommand(Message message, Account account)
-        {
-            return Commands[Commands.Keys.OrderByDescending(s => s.Invoke(message, account)).First()];
-        }
 
         protected Query GetQuery(CallbackQuery message, Account account)
         {
