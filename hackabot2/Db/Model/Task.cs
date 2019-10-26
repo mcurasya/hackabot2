@@ -1,7 +1,7 @@
 
 using System;
 
-namespace hackabot
+namespace hackabot2.Db.Model
 {
     public class Task
     {

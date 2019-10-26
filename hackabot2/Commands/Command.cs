@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using hackabot;
+using hackabot2.Db.Model;
 using Monad;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-namespace BotFramework.Commands
+namespace hackabot2.Commands
 {
     public interface ICommand
     {
@@ -39,7 +39,7 @@ namespace BotFramework.Commands
             EitherStrict<ICommand, IEnumerable<IOneOfMany>> prevCommands)
         {
             if(!Suitable(message, account))
-                throw new BadInputException("Invalid input");
+                throw new BadInputException("Invalid input"); //todo
             return Run(message, client, account, prevCommands);
         }
 
@@ -60,11 +60,7 @@ namespace BotFramework.Commands
     //todo this
     public class BadInputException : Exception
     {
-        public Response ErrResponse;
-        public BadInputException(string name)
-        {
-            
-        }
+        public readonly Response ErrResponse;
         public BadInputException(Response errResponse)
         {
             ErrResponse = errResponse;

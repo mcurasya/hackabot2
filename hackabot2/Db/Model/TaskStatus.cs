@@ -1,4 +1,4 @@
-namespace hackabot
+namespace hackabot2.Db.Model
 {
     public enum TaskStatus
     {

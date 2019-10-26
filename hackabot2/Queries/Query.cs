@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using hackabot;
+using hackabot2.Db.Model;
 using Telegram.Bot.Types;
 
-namespace BotFramework.Queries
+namespace hackabot2.Queries
 {
     public abstract class Query
     {

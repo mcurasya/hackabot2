@@ -2,31 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using BotFramework.Commands;
-using BotFramework.Queries;
-using hackabot;
-using Microsoft.EntityFrameworkCore;
-using StickerMemeDb.Controllers;
+using hackabot.Controllers;
+using hackabot2.Commands;
+using hackabot2.Db.Model;
+using hackabot2.Queries;
+using Monad;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types;
 
-namespace BotFramework.Client
+namespace hackabot2.Client
 {
     public partial class Client
     {
+        public List<(Account, EitherStrict<ICommand, IEnumerable<IOneOfMany>>)> AccountCommandPair;
         public Client(string token, Assembly assembly)
         {
-            var baseType = typeof(ICommand);
-
-            Commands = assembly
-                       .GetTypes()
-                       .Where(t => t.IsSubclassOf(baseType) && !t.IsAbstract)
-                       .Select(c => Activator.CreateInstance(c) as IOneOfMany)
-                       .Where(c => c != null)
-                       .ToDictionary(x => new Func<Message, Account, bool>(x.Suitable), x => x);
-
-            baseType = typeof(Query);
+            var baseType = typeof(Query);
             assembly = baseType.Assembly;
 
             Queries = assembly
@@ -43,7 +35,6 @@ namespace BotFramework.Client
         }
 
         private   TelegramBotClient                                     Bot      { get; }
-        protected Dictionary<Func<Message, Account, bool>, ICommand>     Commands { get; set; }
         protected Dictionary<Func<CallbackQuery, Account, bool>, Query> Queries  { get; set; }
 
         //public async void OnUpdateReceived(object sender, UpdateEventArgs e)
@@ -93,14 +84,26 @@ namespace BotFramework.Client
             }
         }
 
+        public ICommand GetInit()
+        {
+            return null; //todo
+        }
         public async void HandleMessage(Message message)
         {
             var     chatId = message.Chat.Id;
             Account account;
+            EitherStrict<ICommand, IEnumerable<IOneOfMany>> commands;
+            var acc = AccountCommandPair.Where(t => t.Item1.ChatId == chatId);
+            if (acc.Count() != 0)
+            {
+                account = acc.Select(t => t.Item1).First();
+                commands = acc.Select(t => t.Item2).First();
 
+            }
             if (TelegramController.Accounts.ContainsKey(chatId))
             {
                 account = TelegramController.Accounts[chatId];
+                commands = EitherStrict.Left<ICommand, IEnumerable<IOneOfMany>>(GetInit());
             }
             else
             {
@@ -108,20 +111,23 @@ namespace BotFramework.Client
                 contoller.Start();
                 account            = contoller.FromMessage(message);
                 account.Controller = contoller;
+                commands = EitherStrict.Left<ICommand, IEnumerable<IOneOfMany>>(GetInit());
             }
 
-            var command = GetCommand(message, account);
-
             Console.WriteLine(
-                $"Command: {command}, status: {account.Status.ToString()}");
+                //$"Command: {command}, status: {commands.ToString()}");
+                $"Command: {commands}, status: {commands.ToString()}");
 
-            await SendTextMessageAsync(command.Execute(message, this, account));
+                var resp = Response.Eval(account, message, this, commands);
+                if (resp.IsLeft)
+                    await SendTextMessageAsync(resp.Left);
+                else
+                    foreach (var right in resp.Right)
+                    {
+                        await SendTextMessageAsync(right);
+                    }
         }
 
-        protected DbLoggerCategory.Database.Command GetCommand(Message message, Account account)
-        {
-            return Commands[Commands.Keys.OrderByDescending(s => s.Invoke(message, account)).First()];
-        }
 
         protected Query GetQuery(CallbackQuery message, Account account)
         {

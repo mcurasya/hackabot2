@@ -1,14 +1,18 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using hackabot.Controllers;
 using Telegram.Bot.Types;
 
-namespace hackabot
+namespace hackabot2.Db.Model
 {
     public class Account
     {
         public int Id { get; set; }
         public long ChatId { get; set; }
         public string Username { get; set; }
+
+        [NotMapped]
+        public TelegramController Controller { get; set; }
         public static implicit operator ChatId(Account a) => a.ChatId;
 
     }
