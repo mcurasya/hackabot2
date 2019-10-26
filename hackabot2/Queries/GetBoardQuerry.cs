@@ -25,7 +25,40 @@ namespace hackabot.Queries
                 throw new BadInputException(new QuerryResponse().TextMessage(account.ChatId, "No such task"));
             }
         }
-        
-        public static InlineKeyboardMarkup BoardButton(Board board) => new InlineKeyboardMarkup();
+
+        public static InlineKeyboardMarkup BoardButton(Board board)
+        {
+            
+            var input = board.Tasks.ToArray();
+            var keys = new List<List<InlineKeyboardButton>>();
+            
+            for (int i = 0; i < input.Length; i++)
+            {
+                var task = input[i];
+                var button =
+                    new InlineKeyboardButton()
+                    {
+                        Text = task.Name,
+                        CallbackData = PackParams("get_task", task.Name, task.Name)
+                    };
+                if (keys.Count == 0)
+                {
+                    keys.Add(new List<InlineKeyboardButton> { button });
+                }
+                else if (keys.Count > 0)
+                {
+                    if (keys.Last().Count == 1)
+                    {
+                        keys.Last().Add(button);
+                    }
+                    else
+                    {
+                        keys.Add(new List<InlineKeyboardButton> { button });
+                    }
+                }
+            }
+            return keys.ToArray();
+        }
+        }
     }
 }
