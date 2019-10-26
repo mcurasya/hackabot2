@@ -27,17 +27,23 @@ namespace hackabot.Notifications
             await _client.SendTextMessageAsync(task.AssignedTo, messageText);
         }
 
-        public async System.Threading.Tasks.Task Cycle()
+        public async void Cycle()
         {
-            while (true)
+            await System.Threading.Tasks.Task.Run(async () =>
             {
-                foreach (var task in controller.Context.Tasks.Where(task => (task.EndDate.Date - DateTime.Today).Days <= 7 && (task.EndDate.Date - DateTime.Today).Days > 0))
+                while (true)
                 {
-                    await NotifyDaysLeft(task);
-                }
+                    foreach (var task in controller.Context.Tasks.Where(task =>
+                        (task.EndDate.Date - DateTime.Today).Days <= 7 &&
+                        (task.EndDate.Date - DateTime.Today).Days > 0))
+                    {
+                        await NotifyDaysLeft(task);
+                    }
 
-                await System.Threading.Tasks.Task.Delay(new TimeSpan(1,0,0,0));
-            }
+                    await System.Threading.Tasks.Task.Delay(new TimeSpan(1, 0, 0, 0));
+                }
+            });
+
         }
     }
 }
