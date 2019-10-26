@@ -1,10 +1,10 @@
-namespace hackabot2.Db.Model
+namespace hackabot.Db.Model
 {
     public enum Priorities
     {
         Low,
         Medium,
-        High, 
+        High,
         Critical
     }
 }

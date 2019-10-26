@@ -2,13 +2,13 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using hackabot2.Db.Model;
+using hackabot.Db.Model;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using Task = System.Threading.Tasks.Task;
 
-namespace hackabot2.Client
+namespace hackabot.Client
 {
     public partial class Client
     {
@@ -25,7 +25,7 @@ namespace hackabot2.Client
                     else if (message.Type == ResponseType.EditTextMesage)
                     {
                         await Bot.EditMessageTextAsync(message.ChatId, message.EditMessageId, message.Text,
-                            replyMarkup: message.ReplyMarkup as InlineKeyboardMarkup);
+                            replyMarkup : message.ReplyMarkup as InlineKeyboardMarkup);
                     }
                     else if (message.Type == ResponseType.SendDocument)
                     {
@@ -38,8 +38,8 @@ namespace hackabot2.Client
                     else if (message.Type == ResponseType.TextMessage)
                     {
                         await Bot.SendTextMessageAsync(message.ChatId, message.Text,
-                            replyToMessageId: message.ReplyToMessageId,
-                            replyMarkup: message.ReplyMarkup);
+                            replyToMessageId : message.ReplyToMessageId,
+                            replyMarkup : message.ReplyMarkup);
                     }
                     else if (message.Type == ResponseType.Album)
                     {
@@ -62,16 +62,16 @@ namespace hackabot2.Client
             }
         }
 
-        private async Task<Message> SendTextMessageAsync(Account           account, string text,
-                                                         ParseMode         parseMode             = ParseMode.Default,
-                                                         bool              disableWebPagePreview = false,
-                                                         bool              disableNotification   = false,
-                                                         int               replyToMessageId      = 0,
-                                                         IReplyMarkup      replyMarkup           = null,
-                                                         CancellationToken cancellationToken     = default)
+        private async Task<Message> SendTextMessageAsync(Account account, string text,
+            ParseMode parseMode = ParseMode.Default,
+            bool disableWebPagePreview = false,
+            bool disableNotification = false,
+            int replyToMessageId = 0,
+            IReplyMarkup replyMarkup = null,
+            CancellationToken cancellationToken = default)
         {
             var message = await Bot.SendTextMessageAsync(account, text, parseMode, disableWebPagePreview,
-                              disableNotification, replyToMessageId, replyMarkup, cancellationToken);
+                disableNotification, replyToMessageId, replyMarkup, cancellationToken);
             return message;
         }
 

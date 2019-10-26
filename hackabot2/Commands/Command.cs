@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using hackabot2.Db.Model;
+using hackabot.Db.Model;
 using Monad;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-namespace hackabot2.Commands
+namespace hackabot.Commands
 {
     public interface ICommand
     {
@@ -20,7 +20,7 @@ namespace hackabot2.Commands
     }
     public abstract class KeyboardButtonCommand : IOneOfMany
     {
-        public abstract string        Name     { get; }
+        public abstract string Name { get; }
         public virtual bool Suitable(Message message, Account account) =>
             message.Text == Name;
 
@@ -38,8 +38,8 @@ namespace hackabot2.Commands
         public Response Execute(Message message, Client.Client client, Account account,
             EitherStrict<ICommand, IEnumerable<IOneOfMany>> prevCommands)
         {
-            if(!Suitable(message, account))
-                throw new BadInputException("Invalid input"); //todo
+            if (!Suitable(message, account)) { }
+            //throw new BadInputException("Invalid input"); //todo
             return Run(message, client, account, prevCommands);
         }
 

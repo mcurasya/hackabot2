@@ -2,40 +2,40 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using hackabot.Commands;
 using hackabot.Controllers;
-using hackabot2.Commands;
-using hackabot2.Db.Model;
-using hackabot2.Queries;
+using hackabot.Db.Model;
+using hackabot.Queries;
 using Monad;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types;
 
-namespace hackabot2.Client
+namespace hackabot.Client
 {
     public partial class Client
     {
-        public List<(Account, EitherStrict<ICommand, IEnumerable<IOneOfMany>>)> AccountCommandPair;
+        public List < (Account, EitherStrict<ICommand, IEnumerable<IOneOfMany>>) > AccountCommandPair;
         public Client(string token, Assembly assembly)
         {
             var baseType = typeof(Query);
             assembly = baseType.Assembly;
 
             Queries = assembly
-                      .GetTypes()
-                      .Where(t => t.IsSubclassOf(baseType) && !t.IsAbstract)
-                      .Select(c => Activator.CreateInstance(c) as Query)
-                      .Where(c => c != null)
-                      .ToDictionary(x => new Func<CallbackQuery, Account, bool>(x.IsSuitable), x => x);
+                .GetTypes()
+                .Where(t => t.IsSubclassOf(baseType) && !t.IsAbstract)
+                .Select(c => Activator.CreateInstance(c) as Query)
+                .Where(c => c != null)
+                .ToDictionary(x => new Func<CallbackQuery, Account, bool>(x.IsSuitable), x => x);
 
-            Bot                 =  new TelegramBotClient(token);
-            Bot.OnMessage       += OnMessageRecieved;
+            Bot = new TelegramBotClient(token);
+            Bot.OnMessage += OnMessageRecieved;
             Bot.OnCallbackQuery += OnQueryReceived;
             Bot.StartReceiving();
         }
 
-        private   TelegramBotClient                                     Bot      { get; }
-        protected Dictionary<Func<CallbackQuery, Account, bool>, Query> Queries  { get; set; }
+        private TelegramBotClient Bot { get; }
+        protected Dictionary<Func<CallbackQuery, Account, bool>, Query> Queries { get; set; }
 
         //public async void OnUpdateReceived(object sender, UpdateEventArgs e)
         //{
@@ -90,7 +90,7 @@ namespace hackabot2.Client
         }
         public async void HandleMessage(Message message)
         {
-            var     chatId = message.Chat.Id;
+            var chatId = message.Chat.Id;
             Account account;
             EitherStrict<ICommand, IEnumerable<IOneOfMany>> commands;
             var acc = AccountCommandPair.Where(t => t.Item1.ChatId == chatId);
@@ -109,7 +109,7 @@ namespace hackabot2.Client
             {
                 var contoller = new TelegramController();
                 contoller.Start();
-                account            = contoller.FromMessage(message);
+                account = contoller.FromMessage(message);
                 account.Controller = contoller;
                 commands = EitherStrict.Left<ICommand, IEnumerable<IOneOfMany>>(GetInit());
             }
@@ -118,16 +118,15 @@ namespace hackabot2.Client
                 //$"Command: {command}, status: {commands.ToString()}");
                 $"Command: {commands}, status: {commands.ToString()}");
 
-                var resp = Response.Eval(account, message, this, commands);
-                if (resp.IsLeft)
-                    await SendTextMessageAsync(resp.Left);
-                else
-                    foreach (var right in resp.Right)
-                    {
-                        await SendTextMessageAsync(right);
-                    }
+            var resp = Response.Eval(account, message, this, commands);
+            if (resp.IsLeft)
+                await SendTextMessageAsync(resp.Left);
+            else
+                foreach (var right in resp.Right)
+                {
+                    await SendTextMessageAsync(right);
+                }
         }
-
 
         protected Query GetQuery(CallbackQuery message, Account account)
         {

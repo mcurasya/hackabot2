@@ -1,19 +1,18 @@
 using System.Collections.Generic;
 using System.Linq;
-using hackabot2.Db.Model;
+using hackabot.Db.Model;
 using Telegram.Bot.Types;
 
-namespace hackabot2.Queries
+namespace hackabot.Queries
 {
     public abstract class Query
     {
         public abstract string Alias { get; }
 
         public Response Execute(CallbackQuery message, Account account) =>
-        Run(message, account, UnpackParams(message.Data));
+            Run(message, account, UnpackParams(message.Data));
 
         protected abstract Response Run(CallbackQuery message, Account account, Dictionary<string, string> values);
-
 
         public virtual bool IsSuitable(CallbackQuery message, Account account)
         {
@@ -21,16 +20,15 @@ namespace hackabot2.Queries
         }
 
         public static Dictionary<string, string> UnpackParams(string input) =>
-        input.Substring(input.IndexOf(' ') + 1)
-             .Split('&')
-             .Select(s => s.Split('='))
-             .ToDictionary(r => r[0], r => r[1]);
-
+            input.Substring(input.IndexOf(' ') + 1)
+            .Split('&')
+            .Select(s => s.Split('='))
+            .ToDictionary(r => r[0], r => r[1]);
 
         public static string PackParams(string Alias, string Name, string Value) =>
-        PackParams(Alias, (Name, Value));
+            PackParams(Alias, (Name, Value));
 
-        public static string PackParams(string Alias, params (string Name, string Value)[] input) =>
-        $"{Alias} {string.Join('&'.ToString(), input.Select(i => $"{i.Name}={i.Value}"))}";
+        public static string PackParams(string Alias, params(string Name, string Value) [] input) =>
+            $"{Alias} {string.Join('&'.ToString(), input.Select(i => $"{i.Name}={i.Value}"))}";
     }
 }

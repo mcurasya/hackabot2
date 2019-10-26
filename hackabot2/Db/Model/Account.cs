@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using hackabot.Controllers;
 using Telegram.Bot.Types;
 
-namespace hackabot2.Db.Model
+namespace hackabot.Db.Model
 {
     public class Account
     {

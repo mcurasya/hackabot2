@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace hackabot2
+namespace hackabot
 {
     class Program
     {
