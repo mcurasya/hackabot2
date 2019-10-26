@@ -14,8 +14,24 @@ namespace hackabot
       todo add command to all constructors
       todo set dafalt next commands as prev commands
      */
+    public class QuerryResponse : Response
+    {
+        public QuerryResponse(EitherStrict<ICommand, IEnumerable<IOneOfMany>> nextPossible) : base(nextPossible)
+        {
+        }
+
+        public QuerryResponse()
+        {
+            
+        }
+    }
     public class Response
     {
+        protected Response()
+        {
+            Responses = new List<ResponseMessage>();
+        }
+
         public Response(EitherStrict<ICommand, IEnumerable<IOneOfMany>> nextPossible)
         {
             Responses = new List<ResponseMessage>();
