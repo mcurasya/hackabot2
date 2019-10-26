@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using BotFramework.Commands;
-using ImageProcessing;
-using StickerMemeDb.Model;
+using hackabot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
 using Monad;
-using Monad.Parsec;
 
 namespace BotFramework
 {
@@ -18,13 +16,14 @@ namespace BotFramework
      */
     public class Response
     {
-        public Response()
+        public Response(EitherStrict<ICommand, IEnumerable<IOneOfMany>> nextPossible)
         {
             Responses = new List<ResponseMessage>();
+            this.nextPossible = nextPossible;
         }
         public List<ResponseMessage> Responses { get; set; }
 
-        public EitherStrict<ICommand, IEnumerable<IOneOfMany>> nextPossible { get; set; }
+        public EitherStrict<ICommand, IEnumerable<IOneOfMany>> nextPossible { get; }
         public EitherStrict<Response, IEnumerable<Response>> Eval(Account a, Message m, Client.Client c)
         {
             try
@@ -96,26 +95,6 @@ namespace BotFramework
             return this;
         }
 
-        public Response SendSheet(ChatId chatId, List<MemeSheet> sheets)
-        {
-            Responses.Add(new ResponseMessage(ResponseType.MemeSheets)
-            {
-                ChatId = chatId,
-                Sheets = sheets
-            });
-            return this;
-        }
-
-        public Response SendMeme(Meme meme, ChatId chatId, InlineKeyboardMarkup addMemeButton)
-        {
-            Responses.Add(new ResponseMessage(ResponseType.Meme)
-            {
-                Meme        = meme,
-                ChatId      = chatId,
-                ReplyMarkup = addMemeButton
-            });
-            return this;
-        }
 
         public Response EditMessageMarkup(ChatId               accountChatId, int messageMessageId,
                                           InlineKeyboardMarkup addMemeButton)
@@ -145,8 +124,6 @@ namespace BotFramework
         public InputOnlineFile               Document          { get; set; }
         public ResponseType                  Type              { get; }
         public IEnumerable<IAlbumInputMedia> Album             { get; set; }
-        public IEnumerable<MemeSheet>        Sheets            { get; set; }
-        public Meme                          Meme              { get; set; }
         public int                           MessageId         { get; set; }
     }
 
@@ -158,8 +135,6 @@ namespace BotFramework
         SendDocument,
         SendPhoto,
         Album,
-        MemeSheets,
-        Meme,
         EditMessageMarkup
     }
 }

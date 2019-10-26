@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using hackabot;
 using Monad;
-using StickerMemeDb.Model;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
