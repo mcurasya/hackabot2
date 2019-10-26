@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using hackabot2.Db.Controllers;
-using hackabot2.Db.Controllers;
 using Telegram.Bot.Types;
 
 namespace hackabot.Db.Model
@@ -24,7 +23,7 @@ namespace hackabot.Db.Model
         [ForeignKey("OwnerId")]
         public Account Owner { get; set; }
 
-        public List<Account> Workers { get; set; }
+        public List<WorkerToBoard> Workers { get; set; }
         public List<Task> Tasks { get; set; }
 
     }

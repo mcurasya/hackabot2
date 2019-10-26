@@ -30,5 +30,7 @@ namespace hackabot.Queries
 
         public static string PackParams(string Alias, params(string Name, string Value) [] input) =>
             $"{Alias} {string.Join('&'.ToString(), input.Select(i => $"{i.Name}={i.Value}"))}";
+        //getstats accountid=23
+        //get_board boardid=3
     }
 }
