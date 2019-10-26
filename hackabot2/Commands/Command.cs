@@ -38,8 +38,8 @@ namespace hackabot.Commands
         public Response Execute(Message message, Client.Client client, Account account,
             EitherStrict<ICommand, IEnumerable<IOneOfMany>> prevCommands)
         {
-            if (!Suitable(message, account)) { }
-            //throw new BadInputException("Invalid input"); //todo
+            if (!Suitable(message, account))
+                throw new BadInputException(new Response(prevCommands).TextMessage(account.ChatId, "Invalid input")); 
             return Run(message, client, account, prevCommands);
         }
 

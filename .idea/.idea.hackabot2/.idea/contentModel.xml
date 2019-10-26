@@ -11,6 +11,7 @@
         </e>
         <e p="Commands" t="Include">
           <e p="Command.cs" t="Include" />
+          <e p="StartCommand.cs" t="Include" />
         </e>
         <e p="Db" t="Include">
           <e p="Controllers" t="Include">

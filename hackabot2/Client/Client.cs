@@ -86,7 +86,7 @@ namespace hackabot.Client
 
         public ICommand GetInit()
         {
-            return null; //todo
+            return new StartCommand();
         }
         public async void HandleMessage(Message message)
         {
