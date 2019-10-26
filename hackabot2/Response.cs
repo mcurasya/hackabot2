@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BotFramework.Commands;
+using hackabot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
