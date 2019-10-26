@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using hackabot.Commands;
 using hackabot.Db.Model;
@@ -32,8 +33,10 @@ namespace hackabot
             {
                 if (nextPossible.IsLeft)
                     return nextPossible.Left.Execute(m, c, a, nextPossible);
-                return EitherStrict.Right<Response, IEnumerable<Response>>(nextPossible.Right.Where(t => t.Suitable(m, a))
-                    .Select(t => t.Execute(m, c, a, nextPossible)));
+                var right = nextPossible.Right.ToList();
+                right.AddRange(StaticCommands);
+                var toRet = right.Where(t => t.Suitable(m, a)).Select(t => t.Execute(m, c, a, nextPossible));
+                return EitherStrict.Right<Response, IEnumerable<Response>>(toRet);
 
             }
             catch (BadInputException e)
@@ -41,6 +44,19 @@ namespace hackabot
                 return e.ErrResponse;
             }
         }
+
+        static Response()
+        {
+            var baseType = typeof(StaticCommand);
+            var assembly = baseType.Assembly;
+            StaticCommands = assembly
+                .GetTypes()
+                .Where(t => t.IsSubclassOf(baseType) && !t.IsAbstract)
+                .Select(c => Activator.CreateInstance(c) as IOneOfMany)
+                .Where(c => c != null).ToList();
+        }
+
+        public static List<IOneOfMany> StaticCommands; 
 
         #region Constructors
         public Response TextMessage(ChatId chat, string text, IReplyMarkup replyMarkup = null,
