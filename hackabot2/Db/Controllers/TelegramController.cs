@@ -140,6 +140,12 @@ namespace hackabot2.Db.Controllers
         {
             return Context.Tasks.Where(task => task.Board == board && task.AssignedTo == user).ToList();
         }
+
+        public String GetStatAboutUserByBoard(Account user)
+        {
+            var userTasks = Context.Tasks.Where(task => task.AssignedTo == user).ToList();
+            return $@"current user has {userTasks.Count(task => task.Status != TaskStatus.Done)} assigned tasks, {userTasks.Count(task => task.Status == TaskStatus.Done)} closed tasks, has closed {userTasks.Count(task => task.Status == TaskStatus.Done && task.FinishDate.Date == DateTime.Today)} tasks today.";
+        }
         
         #endregion
 
