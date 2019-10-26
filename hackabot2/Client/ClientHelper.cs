@@ -62,7 +62,7 @@ namespace hackabot.Client
             }
         }
 
-        private async Task<Message> SendTextMessageAsync(Account account, string text,
+        public async Task<Message> SendTextMessageAsync(Account account, string text,
             ParseMode parseMode = ParseMode.Default,
             bool disableWebPagePreview = false,
             bool disableNotification = false,

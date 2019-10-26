@@ -127,7 +127,6 @@ namespace hackabot2.Db.Controllers
 
         public Board[] GetBoards(Account account)
         {
-
             var to = Context.WorkerToBoards.Where(a => a.Worker.Id == account.Id);
             return Context.Boards.Where(board => to.FirstOrDefault(a => a.Board.Id == board.Id) != null).ToArray();
         }
@@ -137,12 +136,12 @@ namespace hackabot2.Db.Controllers
             return Context.Tasks.Where(task => task.Board == board && task.AssignedTo == user).ToList();
         }
 
-        public String GetStatAboutUserByBoard(Account user)
+        public String GetStatAboutUserByBoard(Account user, Board board)
         {
-            var userTasks = Context.Tasks.Where(task => task.AssignedTo == user).ToList();
+            var userTasks = Context.Tasks.Where(task => task.AssignedTo == user && task.Board == board).ToList();
             return $@"current user has {userTasks.Count(task => task.Status != TaskStatus.Done)} assigned tasks, {userTasks.Count(task => task.Status == TaskStatus.Done)} closed tasks, has closed {userTasks.Count(task => task.Status == TaskStatus.Done && task.FinishDate.Date == DateTime.Today)} tasks today.";
         }
-
+        
         #endregion
 
     }
