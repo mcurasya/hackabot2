@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using hackabot;
 using hackabot.Db.Model;
+using SixLabors.ImageSharp.Processing.Processors.Transforms;
 using Telegram.Bot.Types;
 
-namespace hackabot.Controllers
+namespace hackabot2.Db.Controllers
 
 {
     public class TelegramController
@@ -79,8 +81,36 @@ namespace hackabot.Controllers
 
             return account;
         }
-
+        
         #endregion
 
+        #region DBQueries
+
+        public void AddTask(Task task)
+        {
+            
+        }
+
+        public void AddBoard(Board board)
+        {
+            
+        }
+
+        public void AssignWorkerToBoard(Account worker, Board board)
+        {
+            
+        }
+
+        public void ChangePriority(Task task, Priorities priorities)
+        {
+            
+        }
+
+        public void ChangeWorkerAccessLevel(WorkerToBoard worker, Board board, AccessLevel accessLevel)
+        {
+            
+        }
+        
+        #endregion
     }
 }
