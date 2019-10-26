@@ -1,78 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using hackabot.Commands;
+﻿using System.Collections.Generic;
 using hackabot.Db.Model;
-using Monad;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace hackabot
 {
-    /*
-      todo add command to all constructors
-      todo set dafalt next commands as prev commands
-     */
-    public class QuerryResponse : Response
-    {
-        public QuerryResponse(EitherStrict<ICommand, IEnumerable<IOneOfMany>> nextPossible) : base(nextPossible)
-        {
-        }
-
-        public QuerryResponse()
-        {
-            
-        }
-    }
     public class Response
     {
-        protected Response()
+        public Response()
         {
             Responses = new List<ResponseMessage>();
-        }
-
-        public Response(EitherStrict<ICommand, IEnumerable<IOneOfMany>> nextPossible)
-        {
-            Responses = new List<ResponseMessage>();
-            this.nextPossible = nextPossible;
         }
         public List<ResponseMessage> Responses { get; set; }
-
-        public EitherStrict<ICommand, IEnumerable<IOneOfMany>> nextPossible { get; }
-
-        public EitherStrict<Response, IEnumerable<Response>> Eval(Account a, Message m, Client.Client c) =>
-            Eval(a, m, c, this.nextPossible);
-        public static EitherStrict<Response, IEnumerable<Response>> Eval(Account a, Message m, Client.Client c, EitherStrict<ICommand, IEnumerable<IOneOfMany>> nextPossible)
-        {
-            try
-            {
-                if (nextPossible.IsLeft)
-                    return nextPossible.Left.Execute(m, c, a, nextPossible);
-                var right = nextPossible.Right.ToList();
-                right.AddRange(StaticCommands);
-                var toRet = right.Where(t => t.Suitable(m, a)).Select(t => t.Execute(m, c, a, nextPossible));
-                return EitherStrict.Right<Response, IEnumerable<Response>>(toRet);
-
-            }
-            catch (BadInputException e)
-            {
-                return e.ErrResponse;
-            }
-        }
-
-        static Response()
-        {
-            var baseType = typeof(StaticCommand);
-            var assembly = baseType.Assembly;
-            StaticCommands = assembly
-                .GetTypes()
-                .Where(t => t.IsSubclassOf(baseType) && !t.IsAbstract)
-                .Select(c => Activator.CreateInstance(c) as IOneOfMany)
-                .Where(c => c != null).ToList();
-        }
-
-        public static List<IOneOfMany> StaticCommands; 
 
         #region Constructors
         public Response TextMessage(ChatId chat, string text, IReplyMarkup replyMarkup = null,

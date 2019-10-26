@@ -19,11 +19,15 @@ namespace hackabot.Queries
             return message.Data.StartsWith(Alias);
         }
 
-        public static Dictionary<string, string> UnpackParams(string input) =>
-            input.Substring(input.IndexOf(' ') + 1)
-            .Split('&')
-            .Select(s => s.Split('='))
-            .ToDictionary(r => r[0], r => r[1]);
+        public static Dictionary<string, string> UnpackParams(string input)
+        {
+            if (!input.Contains(' ') || !input.Contains('='))
+                return new Dictionary<string, string>();
+            return input.Substring(input.IndexOf(' ') + 1)
+                .Split('&')
+                .Select(s => s.Split('='))
+                .ToDictionary(r => r[0], r => r[1]);
+        }
 
         public static string PackParams(string Alias, string Name, string Value) =>
             PackParams(Alias, (Name, Value));

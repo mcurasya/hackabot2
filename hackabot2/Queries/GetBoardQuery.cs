@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hackabot.Commands;
 using hackabot.Db.Model;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -10,30 +9,83 @@ namespace hackabot.Queries
 {
     public class GetBoardQuerry : Query
     {
-        public override string Alias { get; } = "get_task_list";
+        public override string Alias { get; } = "get_board";
         protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
         {
-            var boardName = values.First().Value;
+            int boardId = int.Parse(values["id"]);
             try
             {
-                var board = account.Controller.GetBoards(account).First(t => t.Name == boardName);
+                var board = account.Controller.GetBoard(boardId);
                 var text = "Here is your tasks:";
-                return new QuerryResponse().EditMessageMarkup(account, message.Message.MessageId, BoardButton(board)).EditTextMessage(account.ChatId, message.Message.MessageId, text);
+                return new Response().EditTextMessage(account.ChatId, message.Message.MessageId, text, ManageBoard(board));
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                throw new BadInputException(new QuerryResponse().TextMessage(account.ChatId, "No such board"));
+                return new Response().TextMessage(account.ChatId, "No such board");
             }
         }
+        //for user
+        public static InlineKeyboardMarkup ViewBoard(Board b)
+        {
+            return new InlineKeyboardButton[]
+            {
+                new InlineKeyboardButton
+                {
+                    Text = "<<",
+                        CallbackData = "board_list"
+                },
+                new InlineKeyboardButton
+                {
+                    Text = "Tasks",
+                        CallbackData = "manage_tasks id=" + b.Id
+                }
+            };
+        }
+        //for admin
+        public static InlineKeyboardMarkup ManageBoard(Board b)
+        {
+            return new InlineKeyboardMarkup(
+                new InlineKeyboardButton[][]
+                {
+                    new InlineKeyboardButton[]
+                        {
+                            new InlineKeyboardButton
+                            {
+                                Text = "Edit Board",
+                                    CallbackData = "manage_board id=" + b.Id
+                            },
+                            new InlineKeyboardButton
+                            {
+                                Text = "Manage People",
+                                    CallbackData = "manage_people id=" + b.Id
+                            }
+                        },
+                        new InlineKeyboardButton[]
+                        {
+                            new InlineKeyboardButton
+                            {
+                                Text = "<<",
+                                    CallbackData = "board_list"
+                            },
+                            new InlineKeyboardButton
+                            {
+                                Text = "Manage Tasks",
+                                    CallbackData = "manage_tasks id=" + b.Id
+                            }
+                        }
 
+                }
+
+            );
+        }
         //this is with taks, not boards
         public static InlineKeyboardMarkup BoardButton(Board board)
         {
-            
-            var input = board.Tasks.ToArray();
+
+            var input = board.Tasks?.ToArray();
             var keys = new List<List<InlineKeyboardButton>>();
-            
+
             for (int i = 0; i < input.Length; i++)
             {
                 var task = input[i];

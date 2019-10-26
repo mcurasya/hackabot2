@@ -9,18 +9,16 @@ using Telegram.Bot.Types.Enums;
 
 namespace hackabot2.Commands
 {
-    public class WaitForTaskNameCommand : InputCommand
+    public class WaitForTaskNameCommand : Command
     {
-        public override MessageType[] InputTypes => new [] { MessageType.Text };
-
-        protected override Response Run(Message message, Client client, Account account, EitherStrict<ICommand, IEnumerable<IOneOfMany>> prevCommands)
+        public override Response Execute(Message message, Client client, Account account)
         {
             if (account.CurrentTask != null)
             {
                 account.CurrentTask.Name = message.Text;
                 account.CurrentTask = null;
-                account.Controller.SaveChanges();  // will it work?
-                return new Response(prevCommands).TextMessage(account, "Task name changed"); //todo board text + menu 
+                account.Controller.SaveChanges(); // will it work?
+                return new Response().TextMessage(account, "Task name changed"); //todo board text + menu 
             }
             account.CurrentTask = new Task()
             {
@@ -29,7 +27,13 @@ namespace hackabot2.Commands
             };
             account.Controller.AddTask(account.CurrentTask);
             account.Controller.SaveChanges();
-            return new Response(prevCommands).TextMessage(account, "New task created"); //todo board text + menu 
+            return new Response().TextMessage(account, "New task created"); //todo board text + menu 
         }
+
+        public override bool Suitable(Message message, Account account)
+        {
+            return false; //todo
+        }
+
     }
 }

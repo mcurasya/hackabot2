@@ -7,18 +7,17 @@ using Telegram.Bot.Types.Enums;
 
 namespace hackabot.Commands
 {
-    public class WaitForBoardNameCommand : InputCommand
+    public class WaitForBoardNameCommand : Command
     {
-        public override MessageType[] InputTypes => new [] { MessageType.Text };
-
-        protected override Response Run(Message message, Client.Client client, Account account, EitherStrict<ICommand, IEnumerable<IOneOfMany>> prevCommands)
+        public override Response Execute(Message message, Client.Client client, Account account)
         {
             if (account.CurrentBoard != null)
             {
                 account.CurrentBoard.Name = message.Text;
-                account.CurrentBoard = null;
+                //why
+                //account.CurrentBoard = null;
                 account.Controller.SaveChanges();
-                return new Response(prevCommands).TextMessage(account, "Board name changed"); //todo board text + menu 
+                return new Response().TextMessage(account, "Board name changed");
             }
             account.CurrentBoard = new Board()
             {
@@ -27,7 +26,13 @@ namespace hackabot.Commands
             };
             account.Controller.AddBoard(account.CurrentBoard);
             account.Controller.SaveChanges();
-            return new Response(prevCommands).TextMessage(account, "New board created"); //todo board text + menu 
+            var response = new Response().TextMessage(account, "New board created");
+            var secondCommand = new BoardCommand();
+            response.Responses.AddRange(secondCommand.Execute(message, client, account).Responses);
+            return response;
         }
+
+        public override bool Suitable(Message message, Account account) => account.Status == AccountStatus.WaitForBoardName;
+
     }
 }

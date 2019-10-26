@@ -1,61 +1,108 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using hackabot.Commands;
 using hackabot.Db.Model;
-using hackabot2.Commands;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace hackabot.Queries
 {
-    public class ManageBoard : Query
+    public class ManagePeople : Query
     {
-        public override string Alias { get; } = "Edit Board";
+        public override string Alias => "manage_people";
+
         protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
         {
-            var board = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values.First().Value);
+
+            var board = account.Controller.GetBoard(int.Parse(values["id"]));
+            //todo list people
+            var text = "this is list of your personal";
+            return new Response().EditTextMessage(account, message.Message.MessageId, text, ManagePeopleButtons(account, board));
+        }
+        public static InlineKeyboardMarkup ManagePeopleButtons(Account a, Board board)
+        {
+            //todo add separate logic for owner and manager
+
+            return new InlineKeyboardMarkup(
+                new InlineKeyboardButton[][]
+                {
+                    new InlineKeyboardButton[]
+                        {
+                            new InlineKeyboardButton()
+                                {
+                                    Text = "Add person",
+                                        CallbackData = $"add_manager id={board.Id}"
+                                },
+                                new InlineKeyboardButton
+                                {
+                                    Text = "Remove Person",
+                                        CallbackData = "manage_tasks id=" + board.Id
+                                }
+                        },
+                        new InlineKeyboardButton[]
+                        {
+                            new InlineKeyboardButton
+                            {
+                                Text = "<<",
+                                    CallbackData = "board_list"
+                            },
+
+                        }
+
+                }
+
+            );
+
+        }
+    }
+    public class ManageBoard : Query
+    {
+        public override string Alias { get; } = "manage_board";
+        protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
+        {
+            var board = account.Controller.GetBoard(int.Parse(values["id"]));
+            //todo boards stats
             var text = $@"Board: {board.Name}
 Owner: {board.Owner.Username}
 ";
-            return new QuerryResponse().EditMessageMarkup(account, message.Message.MessageId, ManageBoardButtons(account, board)).EditTextMessage(account.ChatId, message.Message.MessageId, text);;
+            return new Response().EditTextMessage(account.ChatId, message.Message.MessageId, text, ManageBoardButtons(account, board));
         }
 
         public static InlineKeyboardMarkup ManageBoardButtons(Account a, Board board)
         {
 
             var buttons = new List<InlineKeyboardButton>();
-                buttons.Add(
-                    new InlineKeyboardButton()
-                    {
-                        Text = "View tasks",
+            buttons.Add(
+                new InlineKeyboardButton()
+                {
+                    Text = "View tasks",
                         CallbackData = $"get_task_list {board.Id}"
-                    });
+                });
             if (board.Owner == a)
             {
                 buttons.Add(
                     new InlineKeyboardButton()
                     {
                         Text = "Add manager",
-                        CallbackData = $"add_manager {board.Id}"
+                            CallbackData = $"add_manager {board.Id}"
                     });
-            buttons.Add(new InlineKeyboardButton()
-            {
-                Text = "Change Name",
-                CallbackData = $"change_name {board.Id}"
-            });
-            buttons.Add(new InlineKeyboardButton()
-            {
-                Text = "Create Task",
-                CallbackData = $"create_task {board.Id}"
+                buttons.Add(new InlineKeyboardButton()
+                {
+                    Text = "Change Name",
+                        CallbackData = $"change_name {board.Id}"
+                });
+                buttons.Add(new InlineKeyboardButton()
+                {
+                    Text = "Create Task",
+                        CallbackData = $"create_task {board.Id}"
 
-            });
-            buttons.Add(new InlineKeyboardButton()
-            {
-                Text = "Edit Task",
-                CallbackData = $"edit_task {board.Id}"
+                });
+                buttons.Add(new InlineKeyboardButton()
+                {
+                    Text = "Edit Task",
+                        CallbackData = $"edit_task {board.Id}"
 
-            });
+                });
             }
             return buttons.ToArray();
         }
@@ -66,7 +113,7 @@ Owner: {board.Owner.Username}
         protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
         {
             account.CurrentBoard = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values.First().Value);
-            return new Response(new WaitForBoardNameCommand()).TextMessage(account.ChatId, "Please enter new name");
+            return new Response().TextMessage(account.ChatId, "Please enter new name");
         }
 
     }
@@ -76,7 +123,7 @@ Owner: {board.Owner.Username}
         protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
         {
             var board = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values.First().Value);
-            return new Response(new WaitForTaskNameCommand()).TextMessage(account.ChatId, "Please enter task name");
+            return new Response().TextMessage(account.ChatId, "Please enter task name");
         }
 
     }

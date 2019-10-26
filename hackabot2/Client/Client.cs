@@ -17,12 +17,20 @@ namespace hackabot.Client
     public partial class Client
     {
         public NotificationManager NotificationManager { get; set; }
-        public List < (Account, EitherStrict<ICommand, IEnumerable<IOneOfMany>>) > AccountCommandPair = new List < (Account, EitherStrict<ICommand, IEnumerable<IOneOfMany>>) > ();
-        public Client(string token, Assembly assembly)
-        {
-            var baseType = typeof(Query);
-            assembly = baseType.Assembly;
 
+        public Client(string token)
+        {
+            var baseType = typeof(Command);
+            var assembly = baseType.Assembly;
+
+            Commands = assembly
+                .GetTypes()
+                .Where(t => t.IsSubclassOf(baseType) && !t.IsAbstract)
+                .Select(c => Activator.CreateInstance(c) as Command)
+                .Where(c => c != null)
+                .ToDictionary(x => new Func<Message, Account, bool>(x.Suitable), x => x);
+
+            baseType = typeof(Query);
             Queries = assembly
                 .GetTypes()
                 .Where(t => t.IsSubclassOf(baseType) && !t.IsAbstract)
@@ -39,6 +47,8 @@ namespace hackabot.Client
         }
 
         private TelegramBotClient Bot { get; }
+
+        protected Dictionary<Func<Message, Account, bool>, Command> Commands { get; set; }
         protected Dictionary<Func<CallbackQuery, Account, bool>, Query> Queries { get; set; }
 
         public async void HandleQuery(CallbackQuery query)
@@ -68,48 +78,35 @@ namespace hackabot.Client
                 Console.WriteLine(e);
             }
         }
-
         public async void HandleMessage(Message message)
         {
             var chatId = message.Chat.Id;
             Account account;
-            EitherStrict<ICommand, IEnumerable<IOneOfMany>> commands;
-            try
-            {
 
-                var acc = AccountCommandPair.First(t => t.Item1.ChatId == chatId);
-                account = acc.Item1;
-                commands = acc.Item2;
-            }
-            catch
+            if (TelegramController.Accounts.ContainsKey(chatId))
             {
-                if (TelegramController.Accounts.ContainsKey(chatId))
-                {
-                    account = TelegramController.Accounts[chatId];
-                    commands = EitherStrict.Right<ICommand, IEnumerable<IOneOfMany>>(new List<IOneOfMany>());
-                }
-                else
-                {
-                    var contoller = new TelegramController();
-                    contoller.Start();
-                    account = contoller.FromMessage(message);
-                    account.Controller = contoller;
-                    commands = EitherStrict.Right<ICommand, IEnumerable<IOneOfMany>>(new List<IOneOfMany>());
-                }
+                account = TelegramController.Accounts[chatId];
             }
+            else
+            {
+                var contoller = new TelegramController();
+                contoller.Start();
+                account = contoller.FromMessage(message);
+                account.Controller = contoller;
+            }
+
+            var command = GetCommand(message, account);
 
             Console.WriteLine(
-                //$"Command: {command}, status: {commands.ToString()}");
-                $"Command: {commands}, status: {commands.ToString()}");
+                $"Command: {command}, status: {account.Status.ToString()}");
 
-            var resp = Response.Eval(account, message, this, commands);
-            if (resp.IsLeft)
-                await SendTextMessageAsync(resp.Left);
-            else
-                foreach (var right in resp.Right)
-                {
-                    await SendTextMessageAsync(right);
-                }
+            await SendTextMessageAsync(command.Execute(message, this, account));
+        }
+        protected Command GetCommand(Message message, Account account)
+        {
+            var key = Commands.Keys.FirstOrDefault(s => s.Invoke(message, account));
+            if (key == null) return new StartCommand();
+            return Commands[key];
         }
 
         protected Query GetQuery(CallbackQuery message, Account account)

@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Text;
 using hackabot.Db.Model;
-using Monad;
 using Telegram.Bot.Types;
 
 namespace hackabot.Commands
@@ -16,10 +14,9 @@ namespace hackabot.Commands
             //board id | inviter id | accesslevel
             return $"{board.Id}*{inviter.Id}*{((int)accessLevel)}";
         }
-        public override Response Execute(Message message, Client.Client client, Account account, EitherStrict<ICommand, IEnumerable<IOneOfMany>> prevCommands)
+        public override Response Execute(Message message, Client.Client client, Account account)
         {
-
-            if (message.Text.Length < "/start ".Length) return new Response(prevCommands).TextMessage(account.ChatId, "Hi! You have no boards.\nUse buttons to create new or ask your manager to send you invite link.", Keyboards.CreateBoards(account));
+            if (message.Text.Length < "/start ".Length) return new Response().TextMessage(account.ChatId, "Hi! You have no boards.\nUse buttons to create new or ask your manager to send you invite link.", Keyboards.CreateBoards(account));
 
             var param = message.Text.Substring(7);
             var base64EncodedBytes = Convert.FromBase64String(param);
@@ -35,7 +32,7 @@ namespace hackabot.Commands
                     AccessLevel = accessLevel
             });
 
-            return new Response(prevCommands).TextMessage(account, $"You we're added to {board.Name}");
+            return new Response().TextMessage(account, $"You we're added to {board.Name}");
         }
     }
 }

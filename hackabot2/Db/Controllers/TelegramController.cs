@@ -19,7 +19,7 @@ namespace hackabot2.Db.Controllers
             Context = new TelegramContext();
             if (First)
             {
-                Context.Database.EnsureDeleted();
+                //Context.Database.EnsureDeleted();
                 First = false;
             }
             Context.Database.EnsureCreated();
@@ -51,16 +51,16 @@ namespace hackabot2.Db.Controllers
         public Account FromMessage(Message message)
         {
 
-            if (Accounts.ContainsKey(message.Chat.Id))
-                return Accounts[message.Chat.Id];
-            var account = Context.Accounts.FirstOrDefault(a => a.ChatId == message.Chat.Id);
+            if (Accounts.ContainsKey(message.From.Id))
+                return Accounts[message.From.Id];
+            var account = Context.Accounts.FirstOrDefault(a => a.ChatId == message.From.Id);
 
             if (account == null)
             {
                 account = new Account();
-                account.ChatId = message.Chat.Id;
+                account.ChatId = message.From.Id;
                 account.Controller = this;
-                account.Username = message.Chat.Username;
+                account.Username = message.From.Username;
             }
             if (!Accounts.ContainsKey(account.ChatId))
                 Accounts.Add(account.ChatId, account);
@@ -70,9 +70,9 @@ namespace hackabot2.Db.Controllers
 
         public Account FromQuery(CallbackQuery message)
         {
+            if (Accounts.ContainsKey(message.From.Id)) return Accounts[message.From.Id];
             var account = Context.Accounts.FirstOrDefault(a => a.ChatId == message.From.Id);
             if (account != null) return account;
-            //TODO create new  account maybe? or do something idk  
             account = new Account
             {
                 ChatId = message.From.Id
@@ -87,7 +87,7 @@ namespace hackabot2.Db.Controllers
 
         #region Boards
 
-        public Board GetBoard(int id) => Context.Boards.Find(id);
+        public Board GetBoard(int id) => Context.Boards.FirstOrDefault(b => b.Id == id);
 
         #endregion
 
@@ -126,7 +126,10 @@ namespace hackabot2.Db.Controllers
         public Board[] GetBoards(Account account)
         {
             var to = Context.WorkerToBoards.Where(a => a.Worker.Id == account.Id);
-            return Context.Boards.Where(board => to.FirstOrDefault(a => a.Board.Id == board.Id) != null).ToArray();
+            return Context.Boards.
+            Where(board => to.FirstOrDefault(a => a.Board.Id == board.Id) != null)
+                .Union(Context.Boards.Where(b => b.Owner.Id == account.Id))
+                .ToArray();
         }
 
         public List<Task> GetTasks(Board board, Account user)
@@ -139,7 +142,7 @@ namespace hackabot2.Db.Controllers
             var userTasks = Context.Tasks.Where(task => task.AssignedTo == user && task.Board == board).ToList();
             return $@"current user has {userTasks.Count(task => task.Status != TaskStatus.Done)} assigned tasks, {userTasks.Count(task => task.Status == TaskStatus.Done)} closed tasks, has closed {userTasks.Count(task => task.Status == TaskStatus.Done && task.FinishDate.Date == DateTime.Today)} tasks today.";
         }
-        
+
         #endregion
 
     }

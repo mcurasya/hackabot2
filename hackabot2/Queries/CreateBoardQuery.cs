@@ -11,7 +11,8 @@ namespace hackabot.Queries
 
         protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
         {
-            return new Response(new WaitForBoardNameCommand()).EditTextMessage(account, message.Message.MessageId, "Enter name for board:");
+            account.Status = AccountStatus.WaitForBoardName;
+            return new Response().EditTextMessage(account, message.Message.MessageId, "Enter name for board:");
         }
     }
 }

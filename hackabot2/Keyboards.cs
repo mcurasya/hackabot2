@@ -1,26 +1,37 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using hackabot.Db.Model;
-using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace hackabot.Queries
+namespace hackabot
 {
-    public class BoardsQuerry : Query
+    public static class Keyboards
     {
-        public override string Alias { get; } = "Boards";
-        protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
+        public static ReplyKeyboardMarkup Main(Account account)
         {
-            var boards = account.Controller.GetBoards(account);
-            return new QuerryResponse().EditMessageMarkup(account, message.Message.MessageId, BoardsKeyboard(boards));
+            return new ReplyKeyboardMarkup(new KeyboardButton[]
+            {
+                "Boards",
+            });
         }
-        //todo askold
+        public static InlineKeyboardMarkup CreateBoards(Account account)
+        {
+            return new InlineKeyboardButton[]
+            {
+                new InlineKeyboardButton
+                {
+                    Text = "Create Board",
+                        CallbackData = "createboard"
+
+                },
+
+            };
+        }
         public static InlineKeyboardMarkup BoardsKeyboard(IEnumerable<Board> boards)
         {
             var input = boards.ToArray();
             var keys = new List<List<InlineKeyboardButton>>();
-            
+
             for (int i = 0; i < input.Length; i++)
             {
                 var board = input[i];
@@ -28,7 +39,7 @@ namespace hackabot.Queries
                     new InlineKeyboardButton()
                     {
                         Text = board.Name,
-                        CallbackData = PackParams("get_board", board.Name, board.Name)
+                        CallbackData = Queries.Query.PackParams("get_board", "id", board.Id.ToString())
                     };
                 if (keys.Count == 0)
                 {
@@ -48,5 +59,6 @@ namespace hackabot.Queries
             }
             return keys.ToArray();
         }
+
     }
 }
