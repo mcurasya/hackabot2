@@ -147,6 +147,8 @@ namespace hackabot2.Db.Controllers
             return $@"current user has {userTasks.Count(task => task.Status != TaskStatus.Done)} assigned tasks, {userTasks.Count(task => task.Status == TaskStatus.Done)} closed tasks, has closed {userTasks.Count(task => task.Status == TaskStatus.Done && task.FinishDate.Date == DateTime.Today)} tasks today.";
         }
         
+        
+        
         #endregion
 
        
