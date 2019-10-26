@@ -24,16 +24,17 @@ namespace hackabot.Db.Model
         [ForeignKey("OwnerId")]
         public Account Owner { get; set; }
 
-        public List<Account> Workers { get; set; }
+        public List<WorkerToBoard> Workers { get; set; }
         public List<Task> Tasks { get; set; }
 
     }
     public class WorkerToBoard
     {
         public int Id { get; set; }
+
         [ForeignKey("WorkerId")]
         public Account Worker { get; set; }
-        
+
         [ForeignKey("BoardId")]
         public Board Board { get; set; }
 

@@ -90,7 +90,7 @@ namespace hackabot2.Db.Controllers
 
             return account;
         }
-        
+
         #endregion
 
         #region DBQueries
@@ -107,13 +107,9 @@ namespace hackabot2.Db.Controllers
             SaveChanges();
         }
 
-        public void AssignWorkerToBoard(Account worker, Board board)
+        public void AddWorkerToBoard(WorkerToBoard value)
         {
-            Context.WorkerToBoards.Add(new WorkerToBoard()
-            {
-                Worker = worker,
-                Board = board
-            });
+            Context.WorkerToBoards.Add(value);
             SaveChanges();
         }
 
@@ -133,7 +129,7 @@ namespace hackabot2.Db.Controllers
         {
 
             var to = Context.WorkerToBoards.Where(a => a.Worker.Id == account.Id);
-            return Context.Boards.Where(board => to.FirstOrDefault(a => a.Board.Id==board.Id)!=null).ToArray();
+            return Context.Boards.Where(board => to.FirstOrDefault(a => a.Board.Id == board.Id) != null).ToArray();
         }
 
         public List<Task> GetTasks(Board board, Account user)
@@ -146,9 +142,8 @@ namespace hackabot2.Db.Controllers
             var userTasks = Context.Tasks.Where(task => task.AssignedTo == user).ToList();
             return $@"current user has {userTasks.Count(task => task.Status != TaskStatus.Done)} assigned tasks, {userTasks.Count(task => task.Status == TaskStatus.Done)} closed tasks, has closed {userTasks.Count(task => task.Status == TaskStatus.Done && task.FinishDate.Date == DateTime.Today)} tasks today.";
         }
-        
+
         #endregion
 
-       
     }
 }
