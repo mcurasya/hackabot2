@@ -59,6 +59,5 @@ namespace hackabot.Queries
             }
             return keys.ToArray();
         }
-        }
     }
 }
