@@ -15,7 +15,10 @@ namespace hackabot.Queries
         protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
         {
             var board = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values.First().Value);
-            return new QuerryResponse().EditMessageMarkup(account, message.Message.MessageId, ManageBoardButtons(account, board));
+            var text = $@"Board: {board.Name}
+Owner: {board.Owner.Username}
+";
+            return new QuerryResponse().EditMessageMarkup(account, message.Message.MessageId, ManageBoardButtons(account, board)).EditTextMessage(account.ChatId, message.Message.MessageId, text);;
         }
 
         public static InlineKeyboardMarkup ManageBoardButtons(Account a, Board board)
