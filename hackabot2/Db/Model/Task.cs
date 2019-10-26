@@ -1,9 +1,12 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace hackabot.Db.Model
 {
     public class Task
     {
+        [ForeignKey("BoardId")]
+        public Board Board { get; set; }
         public int Id { get; set; }
         public int ParentId { get; set; }
         public Account Creator { get; set; }
