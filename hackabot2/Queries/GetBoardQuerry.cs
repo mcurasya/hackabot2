@@ -17,12 +17,15 @@ namespace hackabot.Queries
             try
             {
                 var board = account.Controller.GetBoards(account).First(t => t.Name == boardName);
-                return new QuerryResponse().EditMessageMarkup(account, message.Message.MessageId, BoardButton(board));
+                var text = $@"Board info:
+                             Name: {board.Name}
+                             Owner: {board.Owner.Username}";
+                return new QuerryResponse().EditMessageMarkup(account, message.Message.MessageId, BoardButton(board)).EditTextMessage(account.ChatId, message.Message.MessageId, text);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                throw new BadInputException(new QuerryResponse().TextMessage(account.ChatId, "No such task"));
+                throw new BadInputException(new QuerryResponse().TextMessage(account.ChatId, "No such board"));
             }
         }
 
@@ -39,7 +42,7 @@ namespace hackabot.Queries
                     new InlineKeyboardButton()
                     {
                         Text = task.Name,
-                        CallbackData = PackParams("get_task", task.Name, task.Name)
+                        CallbackData = PackParams("get_task", board.Id.ToString(), task.Id.ToString())
                     };
                 if (keys.Count == 0)
                 {
