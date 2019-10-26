@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using StickerMemeDb.Model;
+using hackabot;
 using Telegram.Bot.Types;
 
 namespace BotFramework.Queries
