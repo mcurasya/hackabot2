@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using hackabot;
 using hackabot.Db.Model;
-using SixLabors.ImageSharp.Processing.Processors.Transforms;
 using Telegram.Bot.Types;
 
 namespace hackabot2.Db.Controllers
@@ -52,21 +50,10 @@ namespace hackabot2.Db.Controllers
 
         public Account FromMessage(Message message)
         {
-            var start = message.Text?.Length > "/start".Length && message.Text.StartsWith("/start");
-            if (Accounts.ContainsKey(message.Chat.Id) && !start) return Accounts[message.Chat.Id];
-            var account = Context.Accounts.FirstOrDefault(a => a.ChatId == message.Chat.Id);
-            if (message.Text != null)
-            {
-                if (start)
-                {
-                    var param = message.Text.Substring(7);
-                    var base64EncodedBytes = Convert.FromBase64String(param);
-                    param = Encoding.UTF8.GetString(base64EncodedBytes);
-                    var p = param.Split('*');
 
-                    //todo start command
-                }
-            }
+            if (Accounts.ContainsKey(message.Chat.Id))
+                return Accounts[message.Chat.Id];
+            var account = Context.Accounts.FirstOrDefault(a => a.ChatId == message.Chat.Id);
 
             if (account == null)
             {
@@ -95,6 +82,12 @@ namespace hackabot2.Db.Controllers
 
             return account;
         }
+
+        #endregion
+
+        #region Boards
+
+        public Board GetBoard(int id) => Context.Boards.Find(id);
 
         #endregion
 

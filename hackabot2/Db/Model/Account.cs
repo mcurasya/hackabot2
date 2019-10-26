@@ -13,13 +13,16 @@ namespace hackabot.Db.Model
 
         [NotMapped]
         public TelegramController Controller { get; set; }
+
+        [NotMapped]
+        public Board CurrentBoard { get; set; }
         public static implicit operator ChatId(Account a) => a.ChatId;
 
     }
     public class Board
     {
         public int Id { get; set; }
-        public string Name { get; set; } 
+        public string Name { get; set; }
 
         [ForeignKey("OwnerId")]
         public Account Owner { get; set; }
