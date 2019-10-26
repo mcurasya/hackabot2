@@ -90,29 +90,53 @@ namespace hackabot2.Db.Controllers
 
         public void AddTask(Task task)
         {
-
+            Context.Tasks.Add(task);
+            SaveChanges();
         }
 
         public void AddBoard(Board board)
         {
-
+            Context.Boards.Add(board);
+            SaveChanges();
         }
 
-        public void AssignWorkerToBoard(WorkerToBoard value)
+        public void AddWorkerToBoard(WorkerToBoard value)
         {
-
+            Context.WorkerToBoards.Add(value);
+            SaveChanges();
         }
 
-        public void ChangePriority(Task task, Priorities priorities)
+        public void ChangePriority(Task task, Priorities priority)
         {
-
+            Context.Tasks.Find(task.Id).Priority = priority;
+            SaveChanges();
         }
 
-        public void ChangeWorkerAccessLevel(WorkerToBoard worker, Board board, AccessLevel accessLevel)
+        public void ChangeWorkerAccessLevel(WorkerToBoard worker, AccessLevel accessLevel)
+        {
+            Context.WorkerToBoards.Find(worker.Id).AccessLevel = accessLevel;
+            SaveChanges();
+        }
+
+        public Board[] GetBoards(Account account)
         {
 
+            var to = Context.WorkerToBoards.Where(a => a.Worker.Id == account.Id);
+            return Context.Boards.Where(board => to.FirstOrDefault(a => a.Board.Id == board.Id) != null).ToArray();
+        }
+
+        public List<Task> GetTasks(Board board, Account user)
+        {
+            return Context.Tasks.Where(task => task.Board == board && task.AssignedTo == user).ToList();
+        }
+
+        public String GetStatAboutUserByBoard(Account user)
+        {
+            var userTasks = Context.Tasks.Where(task => task.AssignedTo == user).ToList();
+            return $@"current user has {userTasks.Count(task => task.Status != TaskStatus.Done)} assigned tasks, {userTasks.Count(task => task.Status == TaskStatus.Done)} closed tasks, has closed {userTasks.Count(task => task.Status == TaskStatus.Done && task.FinishDate.Date == DateTime.Today)} tasks today.";
         }
 
         #endregion
+
     }
 }

@@ -65,10 +65,6 @@ namespace hackabot.Client
             }
         }
 
-        public ICommand GetInit()
-        {
-            return new StartCommand();
-        }
         public async void HandleMessage(Message message)
         {
             var chatId = message.Chat.Id;
@@ -86,7 +82,7 @@ namespace hackabot.Client
                 if (TelegramController.Accounts.ContainsKey(chatId))
                 {
                     account = TelegramController.Accounts[chatId];
-                    commands = EitherStrict.Left<ICommand, IEnumerable<IOneOfMany>>(GetInit());
+                    commands = EitherStrict.Right<ICommand, IEnumerable<IOneOfMany>>(new List<IOneOfMany>());
                 }
                 else
                 {
@@ -94,7 +90,7 @@ namespace hackabot.Client
                     contoller.Start();
                     account = contoller.FromMessage(message);
                     account.Controller = contoller;
-                    commands = EitherStrict.Left<ICommand, IEnumerable<IOneOfMany>>(GetInit());
+                    commands = EitherStrict.Right<ICommand, IEnumerable<IOneOfMany>>(new List<IOneOfMany>());
                 }
             }
 

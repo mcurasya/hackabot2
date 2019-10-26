@@ -12,5 +12,18 @@ namespace hackabot
                 "Boards",
             });
         }
+        public static InlineKeyboardMarkup CreateBoards(Account account)
+        {
+            return new InlineKeyboardButton[]
+            {
+                new InlineKeyboardButton
+                {
+                    Text = "Create Board",
+                        CallbackData = "createboard"
+
+                },
+
+            };
+        }
     }
 }
