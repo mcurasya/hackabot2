@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using hackabot.Commands;
 using hackabot.Db.Model;
+using hackabot.Notifications;
 using hackabot.Queries;
 using hackabot2.Db.Controllers;
 using Monad;
@@ -15,6 +16,7 @@ namespace hackabot.Client
 {
     public partial class Client
     {
+        public NotificationManager NotificationManager { get; set; }
         public List < (Account, EitherStrict<ICommand, IEnumerable<IOneOfMany>>)> AccountCommandPair = new List<(Account, EitherStrict<ICommand, IEnumerable<IOneOfMany>>)>();
         public Client(string token, Assembly assembly)
         {
@@ -29,6 +31,8 @@ namespace hackabot.Client
                 .ToDictionary(x => new Func<CallbackQuery, Account, bool>(x.IsSuitable), x => x);
 
             Bot = new TelegramBotClient(token);
+            NotificationManager = new NotificationManager(this);
+            NotificationManager.Cycle();
             Bot.OnMessage += OnMessageRecieved;
             Bot.OnCallbackQuery += OnQueryReceived;
             Bot.StartReceiving();
@@ -41,10 +45,10 @@ namespace hackabot.Client
         {
             try
             {
-                var contoller = new TelegramController();
-                contoller.Start();
+                var controller = new TelegramController();
+                controller.Start();
 
-                var account = contoller.FromQuery(query);
+                var account = controller.FromQuery(query);
 
                 if (account == null)
                 {
@@ -52,7 +56,7 @@ namespace hackabot.Client
                     return;
                 }
 
-                account.Controller = account.Controller ?? contoller;
+                account.Controller = account.Controller ?? controller;
                 var command = GetQuery(query, account);
 
                 Console.WriteLine($"Command: {command}");
