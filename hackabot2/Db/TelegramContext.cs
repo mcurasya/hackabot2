@@ -1,8 +1,7 @@
-using hackabot;
+using hackabot2.Db.Model;
 using Microsoft.EntityFrameworkCore;
-using StickerMemeDb.Model;
 
-namespace StickerMemeDb
+namespace hackabot2.Db
 {
     public class TelegramContext : DbContext
     {

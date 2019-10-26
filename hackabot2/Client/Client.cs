@@ -2,17 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using BotFramework.Commands;
-using BotFramework.Queries;
-using hackabot;
-using Microsoft.EntityFrameworkCore;
+using hackabot2.Commands;
+using hackabot2.Db.Controllers;
+using hackabot2.Db.Model;
+using hackabot2.Queries;
 using Monad;
-using StickerMemeDb.Controllers;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types;
 
-namespace BotFramework.Client
+namespace hackabot2.Client
 {
     public partial class Client
     {
@@ -85,15 +84,26 @@ namespace BotFramework.Client
             }
         }
 
+        public ICommand GetInit()
+        {
+            return null; //todo
+        }
         public async void HandleMessage(Message message)
         {
             var     chatId = message.Chat.Id;
             Account account;
+            EitherStrict<ICommand, IEnumerable<IOneOfMany>> commands;
+            var acc = AccountCommandPair.Where(t => t.Item1.ChatId == chatId);
+            if (acc.Count() != 0)
+            {
+                account = acc.Select(t => t.Item1).First();
+                commands = acc.Select(t => t.Item2).First();
 
-            if (AccountCommandPair.Find(t => t.Item1.Chat))
+            }
             if (TelegramController.Accounts.ContainsKey(chatId))
             {
                 account = TelegramController.Accounts[chatId];
+                commands = EitherStrict.Left<ICommand, IEnumerable<IOneOfMany>>(GetInit());
             }
             else
             {
@@ -101,14 +111,21 @@ namespace BotFramework.Client
                 contoller.Start();
                 account            = contoller.FromMessage(message);
                 account.Controller = contoller;
+                commands = EitherStrict.Left<ICommand, IEnumerable<IOneOfMany>>(GetInit());
             }
 
-            var command = GetCommand(message, account);
-
             Console.WriteLine(
-                $"Command: {command}, status: {account.Status.ToString()}");
+                //$"Command: {command}, status: {commands.ToString()}");
+                $"Command: {commands}, status: {commands.ToString()}");
 
-            await SendTextMessageAsync(command.Execute(message, this, account));
+                var resp = Response.Eval(account, message, this, commands);
+                if (resp.IsLeft)
+                    await SendTextMessageAsync(resp.Left);
+                else
+                    foreach (var right in resp.Right)
+                    {
+                        await SendTextMessageAsync(right);
+                    }
         }
 
 

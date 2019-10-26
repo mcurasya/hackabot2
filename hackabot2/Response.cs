@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using BotFramework.Commands;
-using hackabot;
+using hackabot2.Commands;
+using hackabot2.Db.Model;
+using Monad;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
-using Monad;
 
-namespace BotFramework
+namespace hackabot2
 {
     /*
       todo add command to all constructors
@@ -24,7 +23,10 @@ namespace BotFramework
         public List<ResponseMessage> Responses { get; set; }
 
         public EitherStrict<ICommand, IEnumerable<IOneOfMany>> nextPossible { get; }
-        public EitherStrict<Response, IEnumerable<Response>> Eval(Account a, Message m, Client.Client c)
+
+        public EitherStrict<Response, IEnumerable<Response>> Eval(Account a, Message m, Client.Client c) =>
+            Eval(a, m, c, this.nextPossible);
+        public static EitherStrict<Response, IEnumerable<Response>> Eval(Account a, Message m, Client.Client c, EitherStrict<ICommand, IEnumerable<IOneOfMany>> nextPossible)
         {
             try
             {

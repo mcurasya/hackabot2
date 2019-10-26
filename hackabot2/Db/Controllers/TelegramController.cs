@@ -2,10 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using StickerMemeDb.Model;
 using Telegram.Bot.Types;
 
-namespace StickerMemeDb.Controllers
+namespace hackabot2.Db.Controllers
 
 {
     public class TelegramController

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using Telegram.Bot.Types;
 
-namespace hackabot
+namespace hackabot2.Db.Model
 {
     public class Account
     {
