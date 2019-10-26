@@ -50,6 +50,7 @@ namespace hackabot2.Db.Controllers
             if (Accounts.ContainsKey(message.Chat.Id) && !start) return Accounts[message.Chat.Id];
             var account = Context.Accounts.FirstOrDefault(a => a.ChatId == message.Chat.Id);
             if (message.Text != null)
+            {
                 if (start)
                 {
                     var param = message.Text.Substring(7);
@@ -59,7 +60,15 @@ namespace hackabot2.Db.Controllers
 
                     //todo start command
                 }
+            }
 
+            if (account == null)
+            {
+                account = new Account();
+                account.ChatId = message.Chat.Id;
+                account.Controller = this;
+                account.Username = message.Chat.Username;
+            }
             if (!Accounts.ContainsKey(account.ChatId))
                 Accounts.Add(account.ChatId, account);
 

@@ -15,7 +15,7 @@ namespace hackabot.Client
 {
     public partial class Client
     {
-        public List < (Account, EitherStrict<ICommand, IEnumerable<IOneOfMany>>) > AccountCommandPair;
+        public List < (Account, EitherStrict<ICommand, IEnumerable<IOneOfMany>>)> AccountCommandPair = new List<(Account, EitherStrict<ICommand, IEnumerable<IOneOfMany>>)>();
         public Client(string token, Assembly assembly)
         {
             var baseType = typeof(Query);
@@ -36,25 +36,6 @@ namespace hackabot.Client
 
         private TelegramBotClient Bot { get; }
         protected Dictionary<Func<CallbackQuery, Account, bool>, Query> Queries { get; set; }
-
-        //public async void OnUpdateReceived(object sender, UpdateEventArgs e)
-        //{
-        //    if (e.Update.Type == UpdateType.ChannelPost)
-        //    {
-        //        var message    = e.Update.ChannelPost;
-        //        var controller = new TelegramController();
-        //        controller.Start();
-        //        if (message.Document != null || message.Photo != null)
-        //        {
-        //            var meme = await ImageDownloader.DownloadFromMessage(message, this,
-        //                           new ChatId() {ChatId = message.Chat.Id, UserName = message.Chat.Username, Id = -1},
-        //                           controller);
-        //            await EditMessageReplyMarkupAsync(message.Chat, message.MessageId,
-        //                Command.AddMemeButton(controller.GetChannelLanguage(message.Chat.Id), controller, meme.Id,
-        //                    controller.CountLikes(meme.Id)));
-        //        }
-        //    }
-        //}
 
         public async void HandleQuery(CallbackQuery query)
         {
@@ -93,25 +74,28 @@ namespace hackabot.Client
             var chatId = message.Chat.Id;
             Account account;
             EitherStrict<ICommand, IEnumerable<IOneOfMany>> commands;
-            var acc = AccountCommandPair.Where(t => t.Item1.ChatId == chatId);
-            if (acc.Count() != 0)
+            try
             {
-                account = acc.Select(t => t.Item1).First();
-                commands = acc.Select(t => t.Item2).First();
 
+                var acc = AccountCommandPair.First(t => t.Item1.ChatId == chatId);
+                account = acc.Item1;
+                commands = acc.Item2;
             }
-            if (TelegramController.Accounts.ContainsKey(chatId))
+            catch
             {
-                account = TelegramController.Accounts[chatId];
-                commands = EitherStrict.Left<ICommand, IEnumerable<IOneOfMany>>(GetInit());
-            }
-            else
-            {
-                var contoller = new TelegramController();
-                contoller.Start();
-                account = contoller.FromMessage(message);
-                account.Controller = contoller;
-                commands = EitherStrict.Left<ICommand, IEnumerable<IOneOfMany>>(GetInit());
+                if (TelegramController.Accounts.ContainsKey(chatId))
+                {
+                    account = TelegramController.Accounts[chatId];
+                    commands = EitherStrict.Left<ICommand, IEnumerable<IOneOfMany>>(GetInit());
+                }
+                else
+                {
+                    var contoller = new TelegramController();
+                    contoller.Start();
+                    account = contoller.FromMessage(message);
+                    account.Controller = contoller;
+                    commands = EitherStrict.Left<ICommand, IEnumerable<IOneOfMany>>(GetInit());
+                }
             }
 
             Console.WriteLine(
