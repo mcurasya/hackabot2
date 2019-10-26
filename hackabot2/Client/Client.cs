@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using hackabot.Controllers;
 using hackabot2.Commands;
-using hackabot2.Db.Controllers;
 using hackabot2.Db.Model;
 using hackabot2.Queries;
 using Monad;
