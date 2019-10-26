@@ -15,7 +15,7 @@ namespace hackabot.Client
 {
     public partial class Client
     {
-        public List < (Account, EitherStrict<ICommand, IEnumerable<IOneOfMany>>) > AccountCommandPair;
+        public List < (Account, EitherStrict<ICommand, IEnumerable<IOneOfMany>>)> AccountCommandPair = new List<(Account, EitherStrict<ICommand, IEnumerable<IOneOfMany>>)>();
         public Client(string token, Assembly assembly)
         {
             var baseType = typeof(Query);
@@ -74,25 +74,28 @@ namespace hackabot.Client
             var chatId = message.Chat.Id;
             Account account;
             EitherStrict<ICommand, IEnumerable<IOneOfMany>> commands;
-            var acc = AccountCommandPair.Where(t => t.Item1.ChatId == chatId);
-            if (acc.Count() != 0)
+            try
             {
-                account = acc.Select(t => t.Item1).First();
-                commands = acc.Select(t => t.Item2).First();
 
+                var acc = AccountCommandPair.First(t => t.Item1.ChatId == chatId);
+                account = acc.Item1;
+                commands = acc.Item2;
             }
-            if (TelegramController.Accounts.ContainsKey(chatId))
+            catch
             {
-                account = TelegramController.Accounts[chatId];
-                commands = EitherStrict.Left<ICommand, IEnumerable<IOneOfMany>>(GetInit());
-            }
-            else
-            {
-                var contoller = new TelegramController();
-                contoller.Start();
-                account = contoller.FromMessage(message);
-                account.Controller = contoller;
-                commands = EitherStrict.Left<ICommand, IEnumerable<IOneOfMany>>(GetInit());
+                if (TelegramController.Accounts.ContainsKey(chatId))
+                {
+                    account = TelegramController.Accounts[chatId];
+                    commands = EitherStrict.Left<ICommand, IEnumerable<IOneOfMany>>(GetInit());
+                }
+                else
+                {
+                    var contoller = new TelegramController();
+                    contoller.Start();
+                    account = contoller.FromMessage(message);
+                    account.Controller = contoller;
+                    commands = EitherStrict.Left<ICommand, IEnumerable<IOneOfMany>>(GetInit());
+                }
             }
 
             Console.WriteLine(
