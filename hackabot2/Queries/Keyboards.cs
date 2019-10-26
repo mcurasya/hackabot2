@@ -7,7 +7,5 @@ namespace hackabot.Queries
 {
     public static class Keyboards
     {
-
-        public static ReplyKeyboardMarkup BoardsKeyboard(IEnumerable<Board> boards) => null;
     }
 }
