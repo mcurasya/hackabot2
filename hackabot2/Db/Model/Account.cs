@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using hackabot.Controllers;
+using hackabot2.Db.Controllers;
+using hackabot2.Db.Controllers;
 using Telegram.Bot.Types;
 
 namespace hackabot.Db.Model
