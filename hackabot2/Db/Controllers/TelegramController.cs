@@ -99,17 +99,24 @@ namespace hackabot2.Db.Controllers
 
         public void AssignWorkerToBoard(Account worker, Board board)
         {
-            
+            Context.WorkerToBoards.Add(new WorkerToBoard()
+            {
+                Worker = worker,
+                Board = board
+            });
+            SaveChanges();
         }
 
-        public void ChangePriority(Task task, Priorities priorities)
+        public void ChangePriority(Task task, Priorities priority)
         {
-            
+            Context.Tasks.Find(task.Id).Priority = priority;
+            SaveChanges();
         }
 
-        public void ChangeWorkerAccessLevel(WorkerToBoard worker, Board board, AccessLevel accessLevel)
+        public void ChangeWorkerAccessLevel(WorkerToBoard worker, AccessLevel accessLevel)
         {
-            
+            Context.WorkerToBoards.Find(worker.Id).AccessLevel = accessLevel;
+            SaveChanges();
         }
         
         #endregion
