@@ -22,6 +22,8 @@
             <e p="Account.cs" t="Include" />
             <e p="Priorities.cs" t="Include" />
             <e p="Task.cs" t="Include" />
+            <e p="TaskStatus.cs" t="Include" />
+            <e p="TaskType.cs" t="Include" />
           </e>
           <e p="TelegramContext.cs" t="Include" />
         </e>
