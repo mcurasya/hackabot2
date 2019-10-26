@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using hackabot;
 using hackabot.Db.Model;
-using SixLabors.ImageSharp.Processing.Processors.Transforms;
 using Telegram.Bot.Types;
 
 namespace hackabot2.Db.Controllers
@@ -88,12 +87,14 @@ namespace hackabot2.Db.Controllers
 
         public void AddTask(Task task)
         {
-            
+            Context.Tasks.Add(task);
+            SaveChanges();
         }
 
         public void AddBoard(Board board)
         {
-            
+            Context.Boards.Add(board);
+            SaveChanges();
         }
 
         public void AssignWorkerToBoard(Account worker, Board board)
