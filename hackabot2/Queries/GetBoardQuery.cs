@@ -127,7 +127,7 @@ Owner: {board.Owner.Username}
             keys.Add(new List<InlineKeyboardButton>{new InlineKeyboardButton
             {
                 Text = "<<",
-                CallbackData = $"get_board id {board.Id}"
+                CallbackData = Queries.Query.PackParams("get_board", "id", board.Id.ToString())
             }});
             return keys.ToArray();
         }
