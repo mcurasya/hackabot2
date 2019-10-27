@@ -154,16 +154,15 @@ namespace hackabot2.Db.Controllers
         public string GetStatAboutBoard(Board board)
         {
             StringBuilder result = new StringBuilder();
-
-            result.Append($"Current amount of users on board - {Context.WorkerToBoards.Count(b => b.Board.Id == board.Id)}\n");
-            result.Append($"Current amount of TODO tasks - {Context.Tasks.Where(task => task.Board.Id == board.Id).Count(t => t.Status == TaskStatus.TODO)}\n");
-            result.Append($"Current amount of tasks in progress - {Context.Tasks.Where(task => task.Board.Id == board.Id).Count(t => t.Status == TaskStatus.InProgress)}\n");
-            result.Append($"Current amount of tasks in testing - {Context.Tasks.Where(task => task.Board.Id == board.Id).Count(t => t.Status == TaskStatus.Testing)}\n");
-            result.Append($"Current amount of done tasks - {Context.Tasks.Where(task => task.Board.Id == board.Id).Count(t => t.Status == TaskStatus.Done)}\n");
+            result.Append($"🤷 Current amount of users on board - {Context.WorkerToBoards.Count(b => b.Board.Id == board.Id)}\n");
+            result.Append($"🤔 Current amount of TODO tasks - {Context.Tasks.Where(task => task.Board.Id == board.Id).Count(t => t.Status == TaskStatus.TODO)}\n");
+            result.Append($"🛠 Current amount of tasks in progress - {Context.Tasks.Where(task => task.Board.Id == board.Id).Count(t => t.Status == TaskStatus.InProgress)}\n");
+            result.Append($"⚔ Current amount of tasks in testing - {Context.Tasks.Where(task => task.Board.Id == board.Id).Count(t => t.Status == TaskStatus.Testing)}\n");
+            result.Append($"🤑 Current amount of done tasks - {Context.Tasks.Where(task => task.Board.Id == board.Id).Count(t => t.Status == TaskStatus.Done)}\n\n");
             result.Append($"Today {Context.Tasks.Where(task => task.Board.Id == board.Id).Count(t => t.Status == TaskStatus.Done && t.FinishDate.Date==DateTime.Today)} tasks were done\n");
             result.Append($"Amount of expired tasks - {Context.Tasks.Where(task => task.Board.Id == board.Id).Count(t => t.Status != TaskStatus.Done && t.EndDate.Date > DateTime.Today)}\n\n");
-            result.Append($"Most productive worker today - @Forte_Batita with 10 done tasks\n");
-            result.Append($"Worker with most expired tasks - @bananchick_pasha with 4 tasks\n");
+            result.Append($"🧙‍♂️ Most productive worker today - @Forte_Batita with 10 done tasks\n");
+            result.Append($"😂🔫 Worker with most expired tasks - @bananchick_pasha with 4 expired tasks\n");
             //todo stats about users
             return result.ToString();
         }
