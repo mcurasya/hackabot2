@@ -19,10 +19,11 @@ namespace hackabot.Commands
                 account.Controller.SaveChanges();
                 return new Response().TextMessage(account, "Board name changed");
             }
-            account.CurrentBoard = new Board()
+            account.CurrentBoard = new Board
             {
                 Name = message.Text,
-                Owner = account
+                Owner = account,
+
             };
             account.Controller.AddBoard(account.CurrentBoard);
             account.Controller.SaveChanges();

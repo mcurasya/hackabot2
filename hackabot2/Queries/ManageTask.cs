@@ -161,7 +161,7 @@ Status: {task.Status}
             {
               var buttons = Enum.GetValues(typeof(TaskStatus)).Cast<TaskStatus>()
                   .Where(t=>t != task.Status)
-                  .Select(t=> new List<KeyboardButton>() {t.ToString()});
+                  .Select(t=> new List<KeyboardButton> {t.ToString()});
               return new ReplyKeyboardMarkup(buttons);
             }
         }

@@ -7,6 +7,7 @@ using hackabot.Db.Model;
 using Monad;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace hackabot2.Commands
 {
@@ -25,19 +26,23 @@ namespace hackabot2.Commands
             account.CurrentTask = new Task()
             {
                 Name = message.Text,
-                Creator = account
+                Creator = account,
+                CreationDate = DateTime.Today,
+                EndDate = DateTime.Today + new TimeSpan(7,0,0,0),
+                AssignedTo = account
+                
             };
             account.Controller.AddTask(account.CurrentTask);
             account.Controller.SaveChanges();
-            account.Status = AccountStatus.Free;
-            return new Response().TextMessage(account, "New task created"); //todo board text + menu 
+            account.Status = AccountStatus.WaitingForTaskPriority;
+            return new Response().TextMessage(account, "pleas enter task priority").EditMessageMarkup(account.Id, message.MessageId, InlineKeyboardMarkup.Empty()); //todo board text + menu 
         }
 
         public override bool Suitable(Message message, Account account) =>
             account.Status == AccountStatus.WaitForTaskName;
 
     }
-    public class WaitForTaskPrioriyCommand : Command
+    public class WaitForTaskPriorityCommand : Command
     {
         public override Response Execute(Message message, Client client, Account account)
         {
@@ -54,7 +59,7 @@ namespace hackabot2.Commands
                 account.CurrentTask = null;
                 account.Controller.SaveChanges(); // will it work?
                 account.Status = AccountStatus.Free;
-                return new Response().TextMessage(account, text); //todo board text + menu 
+                return new Response().TextMessage(account, text + "\nEnter task description"); //todo board text + menu 
             }
             return new Response().TextMessage(account, "You don't have this task"); //todo board text + menu 
         }
@@ -73,13 +78,13 @@ namespace hackabot2.Commands
                 account.CurrentTask.Description = message.Text;
                 account.Status = AccountStatus.Free;
                 account.Controller.SaveChanges();
-            return new Response().TextMessage(account, text); //todo board text + menu 
+                return new Response().TextMessage(account, text); //todo board text + menu 
             }
             return new Response().TextMessage(account, "You don't have this task"); //todo board text + menu 
         }
 
         public override bool Suitable(Message message, Account account) =>
-            account.Status == AccountStatus.WaitingForTaskPriority;
+            account.Status == AccountStatus.WaitingForTaskDescription;
 
     }
     public class WaitForTaskStatus : Command
