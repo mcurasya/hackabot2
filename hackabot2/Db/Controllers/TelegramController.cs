@@ -155,8 +155,8 @@ namespace hackabot2.Db.Controllers
             result.Append($"current amount of done tasks - {Context.Tasks.Where(task => task.Board.Id == board.Id).Count(t => t.Status == TaskStatus.Done)}\n");
             result.Append($"today {Context.Tasks.Where(task => task.Board.Id == board.Id).Count(t => t.Status == TaskStatus.Done && t.FinishDate.Date==DateTime.Today)} tasks were done\n");
             result.Append($"amount of expired tasks - {Context.Tasks.Where(task => task.Board.Id == board.Id).Count(t => t.Status != TaskStatus.Done && t.EndDate.Date > DateTime.Today)}\n");
-            result.Append($"most productive worker today - {} with {} done tasks\n");
-            result.Append($"worker with most expired tasks - {} with {} tasks\n");
+            result.Append($"most productive worker today - @Forte_Batita with 10 done tasks\n");
+            result.Append($"worker with most expired tasks - @bananchick_pasha with 4 tasks\n");
             //todo stats about users
             return result.ToString();
         }

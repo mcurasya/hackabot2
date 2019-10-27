@@ -123,7 +123,17 @@ Status: {task.Status}
             {//todo add markup
                 account.CurrentBoard = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values.First().Key);
                 account.CurrentTask = account.Controller.GetTasks(account.CurrentBoard, account).First(t => t.Id.ToString() == values.First().Value);
-                return new Response().TextMessage(account.ChatId, "please choose new priority").EditMessageMarkup(account.ChatId, message.Message.MessageId,/* add keyboard to response how */);
+                account.Status = AccountStatus.WaitingForTaskPriority;
+                return new Response().TextMessage(account.ChatId, "please choose new priority",
+                    Priority(account, account.CurrentTask));
+            }
+
+            public static ReplyKeyboardMarkup Priority(Account a, Task task)
+            {
+              var buttons = Enum.GetValues(typeof(Priorities)).Cast<Priorities>()
+                  .Where(t=>t != task.Priority)
+                  .Select(t=> new List<KeyboardButton>() {t.ToString()});
+              return new ReplyKeyboardMarkup(buttons);
             }
         }
         
@@ -143,7 +153,9 @@ Status: {task.Status}
             public override string Alias => "change_status_task";
             protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
             {
-                throw new NotImplementedException();
+                account.CurrentBoard = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values.First().Key);
+                account.CurrentTask = account.Controller.GetTasks(account.CurrentBoard, account).First(t => t.Id.ToString() == values.First().Value);
+                return new Response().TextMessage(account.ChatId, "Please enter new name");
             }
         }
         
@@ -152,7 +164,9 @@ Status: {task.Status}
             public override string Alias => "change_enddate_task";
             protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
             {
-                throw new NotImplementedException();
+                account.CurrentBoard = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values.First().Key);
+                account.CurrentTask = account.Controller.GetTasks(account.CurrentBoard, account).First(t => t.Id.ToString() == values.First().Value);
+                return new Response().TextMessage(account.ChatId, "Please enter new name");
             }
         }
         
