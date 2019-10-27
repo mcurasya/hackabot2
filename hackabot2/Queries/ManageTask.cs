@@ -52,8 +52,8 @@ namespace hackabot.Queries
         public override string Alias { get; } = "edit_task";
         protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
         {
-            var board = account.Controller.GetBoard(int.Parse(values["id"]));
-            var task = board.Tasks.FirstOrDefault();
+            var board = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values.First().Key);
+            var task = account.Controller.GetTasks(board, account).First(t => t.Id.ToString() == values.First().Value);
             var buttons = new List<InlineKeyboardButton>();
             if (task.Creator == account || board.Owner == account)
                 buttons.AddRange(ManageTaskAdminButton(account, task, board));
@@ -74,7 +74,7 @@ Status: {task.Status}
                 new InlineKeyboardButton()
                 {
                     Text = "Add worker",
-                        CallbackData = PackParams("add_worker_task", ("boardId", board.Id.ToString()), ("taskId", task.Id.ToString()))
+                        CallbackData = PackParams("get_worker_list", ("boardId", board.Id.ToString()), ("taskId", task.Id.ToString()))
                 });
             buttons.Add(
                 new InlineKeyboardButton()

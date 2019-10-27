@@ -81,7 +81,7 @@ namespace hackabot.Client
         }
         public async void HandleMessage(Message message)
         {
-            var chatId = message.Chat.Id;
+            var chatId = message.From.Id;
             Account account;
 
             if (TelegramController.Accounts.ContainsKey(chatId))
