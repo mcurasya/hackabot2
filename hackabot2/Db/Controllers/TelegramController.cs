@@ -22,7 +22,7 @@ namespace hackabot2.Db.Controllers
             Context = new TelegramContext();
             if (First)
             {
-                Context.Database.EnsureDeleted();
+                //Context.Database.EnsureDeleted();
                 First = false;
             }
             Context.Database.EnsureCreated();

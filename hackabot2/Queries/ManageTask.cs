@@ -10,44 +10,13 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace hackabot.Queries
 {
-    public class ManageTasksQuery : Query
-    {
-        public override string Alias => "manage_tasks";
-
-        protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
-        {
-            var board = account.Controller.GetBoard(int.Parse(values["id"]));
-            // buttons.Add();
-            return new Response().EditTextMessage(account, message.Message.MessageId, "todo", new InlineKeyboardMarkup(new InlineKeyboardButton[][]
-            {
-                new InlineKeyboardButton[]
-                    {
-                        new InlineKeyboardButton()
-                        {
-                            Text = "Create Task",
-                                CallbackData = PackParams("create_task", "id", board.Id.ToString())
-
-                        }
-                    },
-                    new InlineKeyboardButton[]
-                    {
-                        new InlineKeyboardButton
-                        {
-                            Text = "<<",
-                                CallbackData = "get_board id=" + board.Id
-                        },
-                    }
-
-            }));
-        }
-    }
     public class EditTaskQuery : Query
     {
-        public override string Alias { get; } = "manage_tasks";
+        public override string Alias { get; } = "edit_task";
         protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
         {
-            var board = account.Controller.GetBoard(int.Parse(values["id"]));
-            var task = board.Tasks.FirstOrDefault();
+            var board = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values.First().Key);
+            var task = account.Controller.GetTasks(board, account).First(t => t.Id.ToString() == values.First().Value);
             var buttons = new List<InlineKeyboardButton>();
             if (task.Creator == account || board.Owner == account)
                 buttons.AddRange(ManageTaskAdminButton(account, task, board));
@@ -68,19 +37,19 @@ Status: {task.Status}
                 new InlineKeyboardButton()
                 {
                     Text = "Add worker",
-                        CallbackData = PackParams("add_worker_task", ("boardId", board.Id.ToString()), ("taskId", task.Id.ToString()))
+                    CallbackData = PackParams("get_worker_list", ("boardId", board.Id.ToString()), ("taskId", task.Id.ToString()))
                 });
             buttons.Add(
                 new InlineKeyboardButton()
                 {
                     Text = "Change Name",
-                        CallbackData = PackParams("change_name_task", ("boardId", board.Id.ToString()), ("taskId", task.Id.ToString()))
+                    CallbackData = PackParams("change_name_task", ("boardId", board.Id.ToString()), ("taskId", task.Id.ToString()))
                 });
             buttons.Add(
                 new InlineKeyboardButton()
                 {
                     Text = "Change Priority",
-                        CallbackData = PackParams("change_prior_task", ("boardId", board.Id.ToString()), ("taskId", task.Id.ToString()))
+                    CallbackData = PackParams("change_prior_task", ("boardId", board.Id.ToString()), ("taskId", task.Id.ToString()))
                 }); { }
             return buttons;
         }
@@ -92,13 +61,13 @@ Status: {task.Status}
                 new InlineKeyboardButton()
                 {
                     Text = "Mark as done",
-                        CallbackData = PackParams("done_task", ("boardId", board.Id.ToString()), ("taskId", task.Id.ToString()))
+                    CallbackData = PackParams("done_task", ("boardId", board.Id.ToString()), ("taskId", task.Id.ToString()))
                 });
             buttons.Add(
                 new InlineKeyboardButton()
                 {
                     Text = "Change status",
-                        CallbackData = PackParams("change_status_task", ("boardId", board.Id.ToString()), ("taskId", task.Id.ToString()))
+                    CallbackData = PackParams("change_status_task", ("boardId", board.Id.ToString()), ("taskId", task.Id.ToString()))
                 });
             return buttons;
         }
@@ -107,27 +76,28 @@ Status: {task.Status}
         {
             var buttons = new List<KeyboardButton>
             {
-                new KeyboardButton { Text = Priorities.Low.ToString() },
-                new KeyboardButton { Text = Priorities.Medium.ToString() },
-                new KeyboardButton { Text = Priorities.High.ToString() },
-                new KeyboardButton { Text = Priorities.Critical.ToString() }
+                new KeyboardButton {Text = Priorities.Low.ToString()},
+                new KeyboardButton {Text = Priorities.Medium.ToString()},
+                new KeyboardButton {Text = Priorities.High.ToString()},
+                new KeyboardButton {Text = Priorities.Critical.ToString()}
             };
-            //todo add callback data
+                //todo add callback data
             return buttons;
         }
+        
 
-        public static List<KeyboardButton> ChangeStatusButton(Account a, Task task, Board board) // мб не так поправь плс, эта клавиатура, которая под строкой ввода текста (аналогично с тем, что выше)
+        public static List<KeyboardButton> ChangeStatusButton(Account a, Task task, Board board)// мб не так поправь плс, эта клавиатура, которая под строкой ввода текста (аналогично с тем, что выше)
         {
             var buttons = new List<KeyboardButton>
             {
-                new KeyboardButton { Text = TaskStatus.TODO.ToString() },
-                new KeyboardButton { Text = TaskStatus.InProgress.ToString() },
-                new KeyboardButton { Text = TaskStatus.Testing.ToString() },
-                new KeyboardButton { Text = TaskStatus.Done.ToString() }
+                new KeyboardButton { Text = TaskStatus.TODO.ToString()},
+                new KeyboardButton { Text = TaskStatus.InProgress.ToString()},
+                new KeyboardButton { Text = TaskStatus.Testing.ToString()},
+                new KeyboardButton { Text = TaskStatus.Done.ToString()}
             };
             return buttons;
         }
-
+        
         public class ChangeTaskNameQuery : Query
         {
             public override string Alias { get; } = "change_name_task";
@@ -145,7 +115,7 @@ Status: {task.Status}
         {
             public override string Alias => "change_prior_task";
             protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
-            { //todo add markup
+            {//todo add markup
                 account.CurrentBoard = account.Controller.GetBoards(account)
                     .First(t => t.Id.ToString() == values["boardId"]);
                 account.CurrentTask = account.Controller.GetTasks(account.CurrentBoard, account).First(t => t.Id.ToString() == values["taskId"]);
@@ -156,13 +126,13 @@ Status: {task.Status}
 
             public static ReplyKeyboardMarkup Priority(Account a, Task task)
             {
-                var buttons = Enum.GetValues(typeof(Priorities)).Cast<Priorities>()
-                    .Where(t => t != task.Priority)
-                    .Select(t => new List<KeyboardButton>() { t.ToString() });
-                return new ReplyKeyboardMarkup(buttons);
+              var buttons = Enum.GetValues(typeof(Priorities)).Cast<Priorities>()
+                  .Where(t=>t != task.Priority)
+                  .Select(t=> new List<KeyboardButton>() {t.ToString()});
+              return new ReplyKeyboardMarkup(buttons);
             }
         }
-
+        
         public class ChangeTaskDescriptionQuery : Query
         {
             public override string Alias => "change_description_task";
@@ -175,7 +145,7 @@ Status: {task.Status}
                 return new Response().TextMessage(account.ChatId, "Please enter new name");
             }
         }
-
+        
         public class ChangeTaskStatus : Query
         {
             public override string Alias => "change_status_task";
@@ -189,13 +159,13 @@ Status: {task.Status}
             }
             public static ReplyKeyboardMarkup Status(Account a, Task task)
             {
-                var buttons = Enum.GetValues(typeof(TaskStatus)).Cast<TaskStatus>()
-                    .Where(t => t != task.Status)
-                    .Select(t => new List<KeyboardButton> { t.ToString() });
-                return new ReplyKeyboardMarkup(buttons);
+              var buttons = Enum.GetValues(typeof(TaskStatus)).Cast<TaskStatus>()
+                  .Where(t=>t != task.Status)
+                  .Select(t=> new List<KeyboardButton> {t.ToString()});
+              return new ReplyKeyboardMarkup(buttons);
             }
         }
-
+        
         public class ChangeTaskEndDate : Query
         {
             public override string Alias => "change_enddate_task";
@@ -208,6 +178,6 @@ Status: {task.Status}
                 return new Response().TextMessage(account.ChatId, "Please enter deadline date");
             }
         }
-
+        
     }
 }
