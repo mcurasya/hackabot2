@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using hackabot;
 using hackabot.Db.Model;
+using Microsoft.EntityFrameworkCore;
 using Telegram.Bot.Types;
 
 namespace hackabot2.Db.Controllers
@@ -21,7 +22,7 @@ namespace hackabot2.Db.Controllers
             if (First)
             {
                 Context.Database.EnsureDeleted();
-                First = false;
+                //First = false;
             }
             Context.Database.EnsureCreated();
         }
@@ -88,7 +89,7 @@ namespace hackabot2.Db.Controllers
 
         #region Boards
 
-        public Board GetBoard(int id) => Context.Boards.FirstOrDefault(b => b.Id == id);
+        public Board GetBoard(int id) => Context.Boards.Include(a => a.Tasks).Include(a => a.Workers).FirstOrDefault(b => b.Id == id);
 
         #endregion
 
@@ -160,9 +161,9 @@ namespace hackabot2.Db.Controllers
             //todo stats about users
             return result.ToString();
         }
-        
+
         //todo maybe more statistics 
-        
+
         #endregion
 
     }
