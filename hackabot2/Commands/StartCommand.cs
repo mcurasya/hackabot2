@@ -34,10 +34,9 @@ namespace hackabot.Commands
                 account.Controller.AddWorkerToBoard(new WorkerToBoard()
                 {
                     Worker = account,
-                        Board = board,
-                        AccessLevel = accessLevel
+                    Board = board,
+                    AccessLevel = accessLevel
                 });
-
                 return new Response().TextMessage(account, $"You were added to {board.Name}");
             }
             return new Response().TextMessage(account, "hi!");

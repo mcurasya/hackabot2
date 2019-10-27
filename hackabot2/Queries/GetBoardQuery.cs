@@ -12,14 +12,19 @@ namespace hackabot.Queries
         protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
         {
             int boardId = int.Parse(values["id"]);
+            Console.WriteLine(boardId);
             try
             {
                 var board = account.Controller.GetBoard(boardId);
                 var text = $@"Board: {board.Name}
 Owner: {board.Owner?.Username}
+<<<<<<< HEAD
 {account.Controller.GetStatAboutBoard(board)    
 }
 ";
+=======
+{account.Controller.GetStatAboutBoard(board)}";
+>>>>>>> 2227714d38ac6f96c02abd13e3f25f7c60d8c148
                 return new Response().EditTextMessage(account.ChatId, message.Message.MessageId, text, ManageBoard(board));
             }
             catch (Exception e)
