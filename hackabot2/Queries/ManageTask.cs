@@ -18,33 +18,34 @@ namespace hackabot.Queries
         {
             var board = account.Controller.GetBoard(int.Parse(values["id"]));
             // buttons.Add();
-            return new Response().EditTextMessage(account, message.Message.MessageId, $@"Board {board.Name} have {board.Tasks?.Count} tasks.", new InlineKeyboardMarkup(new InlineKeyboardButton[][]
+            var kb = new InlineKeyboardButton[][]
             {
                 new InlineKeyboardButton[]
+                {
+                    new InlineKeyboardButton()
                     {
-                        new InlineKeyboardButton()
-                            {
-                                Text = "Create Task",
-                                    CallbackData = PackParams("create_task", "id", board.Id.ToString())
+                        Text = "Create Task",
+                        CallbackData = PackParams("create_task", "id", board.Id.ToString())
 
-                            },
-                            new InlineKeyboardButton()
-                            {
-                                Text = "Create Task",
-                                    CallbackData = PackParams("create_task", "id", board.Id.ToString())
-
-                            }
                     },
-                    new InlineKeyboardButton[]
+                    new InlineKeyboardButton()
                     {
-                        new InlineKeyboardButton
-                        {
-                            Text = "<<",
-                                CallbackData = "get_board id=" + board.Id
-                        },
-                    }
+                        Text = "View tasks",
+                        CallbackData = PackParams("get_task_list", "id", board.Id.ToString())
 
-            }));
+                    }
+                },
+                new InlineKeyboardButton[]
+                {
+                    new InlineKeyboardButton
+                    {
+                        Text = "<<",
+                        CallbackData = "get_board id=" + board.Id
+                    },
+                },
+            };
+                return new Response().EditTextMessage(account, message.Message.MessageId,
+                    $@"Board {board.Name} have {board.Tasks?.Count} tasks.", new InlineKeyboardMarkup(kb));
         }
     }
     public class EditTaskQuery : Query
@@ -59,13 +60,15 @@ namespace hackabot.Queries
                 buttons.AddRange(ManageTaskAdminButton(account, task, board));
             if (task.AssignedTo == account)
                 buttons.AddRange(ManageTaskWorkerButton(account, task, board));
+            var timespan = task.EndDate - DateTime.Now;
+            //todo fancy date
             var text = $@"Task: {task.Name}
 Description: {task.Description}
-Estimated Date: {task.EstimatedTime}
+Time left: {timespan.Minutes} minutes 
 Priority: {task.Priority}
 Status: {task.Status}
 ";
-            return new Response().EditMessageMarkup(account, message.Message.MessageId, buttons.ToArray()).EditTextMessage(account.ChatId, message.Message.MessageId, text);
+            return new Response().EditTextMessage(account.ChatId, message.Message.MessageId, text, new InlineKeyboardMarkup(buttons.ToArray()));
         }
         public static List<InlineKeyboardButton> ManageTaskAdminButton(Account a, Task task, Board board)
         {
