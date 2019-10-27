@@ -89,7 +89,11 @@ namespace hackabot2.Db.Controllers
 
         #region Boards
 
-        public Board GetBoard(int id) => Context.Boards.Include(a => a.Tasks).Include(a => a.Workers).FirstOrDefault(b => b.Id == id);
+        public Board GetBoard(int id) => Context.Boards
+            .Include(a => a.Tasks)
+            .Include(a => a.Workers)
+            .Include(a => a.Owner)
+            .FirstOrDefault(b => b.Id == id);
 
         #endregion
 

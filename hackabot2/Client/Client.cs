@@ -40,9 +40,10 @@ namespace hackabot.Client
 
             Bot = new TelegramBotClient(token);
             NotificationManager = new NotificationManager(this);
-            NotificationManager.Cycle();
+            //NotificationManager.Cycle();
             Bot.OnMessage += OnMessageRecieved;
             Bot.OnCallbackQuery += OnQueryReceived;
+            Bot.DeleteWebhookAsync();
             Bot.StartReceiving();
         }
 

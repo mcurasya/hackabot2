@@ -10,6 +10,37 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace hackabot.Queries
 {
+    public class ManageTasksQuery : Query
+    {
+        public override string Alias => "manage_tasks";
+
+        protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
+        {
+            var board = account.Controller.GetBoard(int.Parse(values["id"]));
+            // buttons.Add();
+            return new Response().EditTextMessage(account, message.Message.MessageId, "todo", new InlineKeyboardMarkup(new InlineKeyboardButton[][]
+            {
+                new InlineKeyboardButton[]
+                    {
+                        new InlineKeyboardButton()
+                        {
+                            Text = "Create Task",
+                                CallbackData = PackParams("create_task", "id", board.Id.ToString())
+
+                        }
+                    },
+                    new InlineKeyboardButton[]
+                    {
+                        new InlineKeyboardButton
+                        {
+                            Text = "<<",
+                                CallbackData = "get_board id=" + board.Id
+                        },
+                    }
+
+            }));
+        }
+    }
     public class EditTaskQuery : Query
     {
         public override string Alias { get; } = "manage_tasks";

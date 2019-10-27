@@ -16,7 +16,7 @@ namespace hackabot.Queries
             {
                 var board = account.Controller.GetBoard(boardId);
                 var text = $@"Board: {board.Name}
-Owner: {board.Owner.Username}
+Owner: {board.Owner?.Username}
 {account.Controller.GetStatAboutBoard(board)    
 }
 ";
@@ -74,7 +74,7 @@ Owner: {board.Owner.Username}
                             new InlineKeyboardButton
                             {
                                 Text = "Manage Tasks",
-                                    CallbackData = "get_task_list id=" + b.Id
+                                    CallbackData = "manage_tasks id=" + b.Id
                             }
                         }
 

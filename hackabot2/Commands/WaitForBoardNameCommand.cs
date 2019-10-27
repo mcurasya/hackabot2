@@ -27,10 +27,9 @@ namespace hackabot.Commands
             };
             account.Controller.AddBoard(account.CurrentBoard);
             account.Controller.SaveChanges();
-            var response = new Response().TextMessage(account, "New board created");
+
             var secondCommand = new BoardCommand();
-            response.Responses.AddRange(secondCommand.Execute(message, client, account).Responses);
-            return response;
+            return secondCommand.Execute(message, client, account);
         }
 
         public override bool Suitable(Message message, Account account) => account.Status == AccountStatus.WaitForBoardName;

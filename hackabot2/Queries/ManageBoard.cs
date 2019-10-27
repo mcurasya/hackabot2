@@ -54,12 +54,6 @@ Owner: {board.Owner.Username}
 
             // buttons.Add(new InlineKeyboardButton()
             // {
-            //     Text = "Create Task",
-            //     CallbackData = PackParams("create_task", "id", board.Id.ToString())
-
-            // });
-            // buttons.Add(new InlineKeyboardButton()
-            // {
             //     Text = "Edit Task",
             //     CallbackData = PackParams("edit_task", "id", board.Id.ToString())
 
@@ -79,25 +73,5 @@ Owner: {board.Owner.Username}
         }
 
     }
-    public class CreateTaskQuery : Query
-    {
-        public override string Alias { get; } = "create_task";
-        protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
-        {
-            var board = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values.First().Value);
-            account.Status = AccountStatus.WaitForTaskName;
-            return new Response().TextMessage(account.ChatId, "Please enter task name");
-        }
 
-    }
-    public class AddManager : Query
-    {
-        public override string Alias { get; } = "add_manager";
-        protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
-        {
-            var board = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values.First().Value);
-            throw new NotImplementedException();
-        }
-
-    }
 }
