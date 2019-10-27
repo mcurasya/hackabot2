@@ -34,5 +34,7 @@ namespace hackabot.Db.Model
         WaitingForTaskEndTime,
         WaitingForTaskPriority,
         
+        TaskPresentationStatus
+        
     }
 }

@@ -37,7 +37,7 @@ Status: {task.Status}
                 new InlineKeyboardButton()
                 {
                     Text = "Add worker",
-                    CallbackData = PackParams("add_worker_task", ("boardId", board.Id.ToString()), ("taskId", task.Id.ToString()))
+                    CallbackData = PackParams("get_worker_list", ("boardId", board.Id.ToString()), ("taskId", task.Id.ToString()))
                 });
             buttons.Add(
                 new InlineKeyboardButton()
