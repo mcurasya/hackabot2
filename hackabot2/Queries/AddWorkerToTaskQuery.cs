@@ -11,8 +11,10 @@ namespace hackabot.Queries
         public override string Alias { get; } = "get_worker_list";
         protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
         {
-            var board = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values["boardId"]);
+            var board = account.Controller.GetBoard(int.Parse(values["boardId"]));
             var task = account.Controller.GetTasks(board, account).First(t => t.Id.ToString() == values["taskId"]);
+            account.CurrentTask = task; 
+            account.CurrentBoard = board;
             return new Response().EditMessageMarkup(account, message.Message.MessageId, WorkerButtons(task));
         }
 
@@ -56,7 +58,7 @@ namespace hackabot.Queries
         public override string Alias { get; } = "add_worker";
         protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
         {
-            var board = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values["boardId"]);
+            var board = account.Controller.GetBoard(int.Parse(values["boardId"]));
             var task = account.Controller.GetTasks(board, account).First(t => t.Id.ToString() == values["taskId"]);
             var worker = board.Workers.First(t => t.Id.ToString() == values["worker_id"]);
             task.AssignedTo = worker.Worker;
