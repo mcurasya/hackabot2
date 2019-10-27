@@ -28,7 +28,7 @@ namespace hackabot2.Commands
                 Name = message.Text,
                 Creator = account,
                 CreationDate = DateTime.Today,
-                EndDate = DateTime.Today + new TimeSpan(7,0,0,0),
+                EndDate = DateTime.Today + new TimeSpan(1,0,0,0),
                 AssignedTo = account
                 
             };
