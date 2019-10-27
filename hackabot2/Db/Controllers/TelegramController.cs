@@ -114,6 +114,11 @@ namespace hackabot2.Db.Controllers
             SaveChanges();
         }
 
+        public Account GetAccountById(int id)
+        {
+            return Context.Accounts.FirstOrDefault(i => i.Id==id);
+        }
+        
         public void AddWorkerToBoard(WorkerToBoard value)
         {
             Context.WorkerToBoards.Add(value);
