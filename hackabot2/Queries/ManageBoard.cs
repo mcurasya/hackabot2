@@ -84,23 +84,23 @@ Owner: {board.Owner.Username}
                     new InlineKeyboardButton()
                     {
                         Text = "Add manager",
-                            CallbackData = $"add_manager id {board.Id}"
+                            CallbackData = PackParams("add_manager", "id", board.Id.ToString())
                     });
                 buttons.Add(new InlineKeyboardButton()
                 {
                     Text = "Change Name",
-                        CallbackData = $"change_name id {board.Id}"
+                        CallbackData = PackParams("change_name", "id", board.Id.ToString())
                 });
                 buttons.Add(new InlineKeyboardButton()
                 {
                     Text = "Create Task",
-                        CallbackData = $"create_task id {board.Id}"
+                    CallbackData = PackParams("create_task", "id", board.Id.ToString())
 
                 });
                 buttons.Add(new InlineKeyboardButton()
                 {
                     Text = "Edit Task",
-                        CallbackData = $"edit_task id {board.Id}"
+                    CallbackData = PackParams("edit_task", "id", board.Id.ToString())
 
                 });
             }

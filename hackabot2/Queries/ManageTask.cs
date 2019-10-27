@@ -37,19 +37,19 @@ Status: {task.Status}
                 new InlineKeyboardButton()
                 {
                     Text = "Add worker",
-                        CallbackData = $"add_worker_task {board.Id} {task.Id}"
+                    CallbackData = PackParams("add_worker_task", ("boardId", board.Id.ToString()), ("taskId", task.Id.ToString()))
                 });
             buttons.Add(
                 new InlineKeyboardButton()
                 {
                     Text = "Change Name",
-                        CallbackData = $"change_name_task {board.Id} {task.Id}"
+                    CallbackData = PackParams("change_name_task", ("boardId", board.Id.ToString()), ("taskId", task.Id.ToString()))
                 });
             buttons.Add(
                 new InlineKeyboardButton()
                 {
                     Text = "Change Priority",
-                        CallbackData = $"change_prior_task {board.Id} {task.Id}"
+                    CallbackData = PackParams("change_prior_task", ("boardId", board.Id.ToString()), ("taskId", task.Id.ToString()))
                 }); { }
             return buttons;
         }
@@ -61,13 +61,13 @@ Status: {task.Status}
                 new InlineKeyboardButton()
                 {
                     Text = "Mark as done",
-                        CallbackData = $"done_task {board.Id} {task.Id}"
+                    CallbackData = PackParams("done_task", ("boardId", board.Id.ToString()), ("taskId", task.Id.ToString()))
                 });
             buttons.Add(
                 new InlineKeyboardButton()
                 {
                     Text = "Change status",
-                        CallbackData = $"change_status_task {board.Id} {task.Id}"
+                    CallbackData = PackParams("change_status_task", ("boardId", board.Id.ToString()), ("taskId", task.Id.ToString()))
                 });
             return buttons;
         }
@@ -103,8 +103,9 @@ Status: {task.Status}
             public override string Alias { get; } = "change_name_task";
             protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
             {
-                account.CurrentBoard = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values.First().Key);
-                account.CurrentTask = account.Controller.GetTasks(account.CurrentBoard, account).First(t => t.Id.ToString() == values.First().Value);
+                account.CurrentBoard = account.Controller.GetBoards(account)
+                    .First(t => t.Id.ToString() == values["boardId"]);
+                account.CurrentTask = account.Controller.GetTasks(account.CurrentBoard, account).First(t => t.Id.ToString() == values["taskId"]);
                 return new Response().TextMessage(account.ChatId, "Please enter new name");
             }
 
@@ -115,8 +116,9 @@ Status: {task.Status}
             public override string Alias => "change_prior_task";
             protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
             {//todo add markup
-                account.CurrentBoard = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values.First().Key);
-                account.CurrentTask = account.Controller.GetTasks(account.CurrentBoard, account).First(t => t.Id.ToString() == values.First().Value);
+                account.CurrentBoard = account.Controller.GetBoards(account)
+                    .First(t => t.Id.ToString() == values["boardId"]);
+                account.CurrentTask = account.Controller.GetTasks(account.CurrentBoard, account).First(t => t.Id.ToString() == values["taskId"]);
                 account.Status = AccountStatus.WaitingForTaskPriority;
                 return new Response().TextMessage(account.ChatId, "please choose new priority",
                     Priority(account, account.CurrentTask));
@@ -136,8 +138,9 @@ Status: {task.Status}
             public override string Alias => "change_description_task";
             protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
             {
-                account.CurrentBoard = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values.First().Key);
-                account.CurrentTask = account.Controller.GetTasks(account.CurrentBoard, account).First(t => t.Id.ToString() == values.First().Value);
+                account.CurrentBoard = account.Controller.GetBoards(account)
+                    .First(t => t.Id.ToString() == values["boardId"]);
+                account.CurrentTask = account.Controller.GetTasks(account.CurrentBoard, account).First(t => t.Id.ToString() == values["taskId"]);
                 account.Status = AccountStatus.WaitingForTaskDescription;
                 return new Response().TextMessage(account.ChatId, "Please enter new name");
             }
@@ -148,8 +151,9 @@ Status: {task.Status}
             public override string Alias => "change_status_task";
             protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
             {
-                account.CurrentBoard = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values.First().Key);
-                account.CurrentTask = account.Controller.GetTasks(account.CurrentBoard, account).First(t => t.Id.ToString() == values.First().Value);
+                account.CurrentBoard = account.Controller.GetBoards(account)
+                    .First(t => t.Id.ToString() == values["boardId"]);
+                account.CurrentTask = account.Controller.GetTasks(account.CurrentBoard, account).First(t => t.Id.ToString() == values["taskId"]);
                 account.Status = AccountStatus.WaitingForTaskStatus;
                 return new Response().TextMessage(account.ChatId, "What is new status?", Status(account, account.CurrentTask));
             }
@@ -167,8 +171,9 @@ Status: {task.Status}
             public override string Alias => "change_enddate_task";
             protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
             {
-                account.CurrentBoard = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values.First().Key);
-                account.CurrentTask = account.Controller.GetTasks(account.CurrentBoard, account).First(t => t.Id.ToString() == values.First().Value);
+                account.CurrentBoard = account.Controller.GetBoards(account)
+                    .First(t => t.Id.ToString() == values["boardId"]);
+                account.CurrentTask = account.Controller.GetTasks(account.CurrentBoard, account).First(t => t.Id.ToString() == values["taskId"]);
                 account.Status = AccountStatus.WaitingForTaskEndTime;
                 return new Response().TextMessage(account.ChatId, "Please enter deadline date");
             }
