@@ -29,6 +29,7 @@ namespace hackabot.Db.Model
         WaitForBoardName,
         WaitForTaskName,
         WaitingForTaskDescription,
+        WaitingForTaskStatus,
         WaitingForTaskAssigned,
         WaitingForTaskEndTime,
         WaitingForTaskPriority,

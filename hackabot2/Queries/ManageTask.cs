@@ -144,6 +144,7 @@ Status: {task.Status}
             {
                 account.CurrentBoard = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values.First().Key);
                 account.CurrentTask = account.Controller.GetTasks(account.CurrentBoard, account).First(t => t.Id.ToString() == values.First().Value);
+                account.Status = AccountStatus.WaitingForTaskDescription;
                 return new Response().TextMessage(account.ChatId, "Please enter new name");
             }
         }
@@ -155,7 +156,15 @@ Status: {task.Status}
             {
                 account.CurrentBoard = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values.First().Key);
                 account.CurrentTask = account.Controller.GetTasks(account.CurrentBoard, account).First(t => t.Id.ToString() == values.First().Value);
-                return new Response().TextMessage(account.ChatId, "Please enter new name");
+                account.Status = AccountStatus.WaitingForTaskStatus;
+                return new Response().TextMessage(account.ChatId, "What is new status?", Status(account, account.CurrentTask));
+            }
+            public static ReplyKeyboardMarkup Status(Account a, Task task)
+            {
+              var buttons = Enum.GetValues(typeof(TaskStatus)).Cast<TaskStatus>()
+                  .Where(t=>t != task.Status)
+                  .Select(t=> new List<KeyboardButton>() {t.ToString()});
+              return new ReplyKeyboardMarkup(buttons);
             }
         }
         
@@ -166,7 +175,8 @@ Status: {task.Status}
             {
                 account.CurrentBoard = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values.First().Key);
                 account.CurrentTask = account.Controller.GetTasks(account.CurrentBoard, account).First(t => t.Id.ToString() == values.First().Value);
-                return new Response().TextMessage(account.ChatId, "Please enter new name");
+                account.Status = AccountStatus.WaitingForTaskEndTime;
+                return new Response().TextMessage(account.ChatId, "Please enter deadline date");
             }
         }
         
