@@ -113,6 +113,7 @@ Owner: {board.Owner.Username}
         protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
         {
             account.CurrentBoard = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values.First().Value);
+            account.Status = AccountStatus.WaitForBoardName;
             return new Response().TextMessage(account.ChatId, "Please enter new name");
         }
 
@@ -123,6 +124,7 @@ Owner: {board.Owner.Username}
         protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
         {
             var board = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values.First().Value);
+            account.Status = AccountStatus.WaitForTaskName;
             return new Response().TextMessage(account.ChatId, "Please enter task name");
         }
 

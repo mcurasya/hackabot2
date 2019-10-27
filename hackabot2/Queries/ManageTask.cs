@@ -28,7 +28,7 @@ Estimated Date: {task.EstimatedTime}
 Priority: {task.Priority}
 Status: {task.Status}
 ";
-            return new Response().EditMessageMarkup(account, message.Message.MessageId, buttons.ToArray()).EditTextMessage(account.ChatId, message.Message.MessageId, text);;
+            return new Response().EditMessageMarkup(account, message.Message.MessageId, buttons.ToArray()).EditTextMessage(account.ChatId, message.Message.MessageId, text);
         }
         public static List<InlineKeyboardButton> ManageTaskAdminButton(Account a, Task task, Board board)
         {
@@ -72,12 +72,38 @@ Status: {task.Status}
             buttons.Add( //додамо купу полів типу у нас дохуя функціоналу
                 new InlineKeyboardButton()
                 {
-                    Text = "Add note",
+                    Text = "Add note",//what is note???
                         CallbackData = $"add_note_task {board.Id} {task.Id}"
                 });
             return buttons;
         }
 
+        public static List<KeyboardButton> ChangePriorityButton(Account a, Task task, Board board)
+        {
+            var buttons = new List<KeyboardButton>
+            {
+                new KeyboardButton {Text = Priorities.Low.ToString()},
+                new KeyboardButton {Text = Priorities.Medium.ToString()},
+                new KeyboardButton {Text = Priorities.High.ToString()},
+                new KeyboardButton {Text = Priorities.Critical.ToString()}
+            };
+                //todo add callback data
+            return buttons;
+        }
+        
+
+        public static List<KeyboardButton> ChangeStatusButton(Account a, Task task, Board board)// мб не так поправь плс, эта клавиатура, которая под строкой ввода текста (аналогично с тем, что выше)
+        {
+            var buttons = new List<KeyboardButton>
+            {
+                new KeyboardButton { Text = TaskStatus.TODO.ToString()},
+                new KeyboardButton { Text = TaskStatus.InProgress.ToString()},
+                new KeyboardButton { Text = TaskStatus.Testing.ToString()},
+                new KeyboardButton { Text = TaskStatus.Done.ToString()}
+            };
+            return buttons;
+        }
+        
         public class ChangeTaskNameQuery : Query
         {
             public override string Alias { get; } = "change_name_task";
@@ -90,5 +116,45 @@ Status: {task.Status}
 
         }
 
+        public class ChangeTaskPriorityQuery : Query
+        {
+            public override string Alias => "change_prior_task";
+            protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
+            {//todo add markup
+                account.CurrentBoard = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values.First().Key);
+                account.CurrentTask = account.Controller.GetTasks(account.CurrentBoard, account).First(t => t.Id.ToString() == values.First().Value);
+                return new Response().TextMessage(account.ChatId, "please choose new priority").EditMessageMarkup(account.ChatId, message.Message.MessageId,/* add keyboard to response how */);
+            }
+        }
+        
+        public class ChangeTaskDescriptionQuery : Query
+        {
+            public override string Alias => "change_description_task";
+            protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
+            {
+                account.CurrentBoard = account.Controller.GetBoards(account).First(t => t.Id.ToString() == values.First().Key);
+                account.CurrentTask = account.Controller.GetTasks(account.CurrentBoard, account).First(t => t.Id.ToString() == values.First().Value);
+                return new Response().TextMessage(account.ChatId, "Please enter new name");
+            }
+        }
+        
+        public class ChangeTaskStatus : Query
+        {
+            public override string Alias => "change_status_task";
+            protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
+            {
+                throw new NotImplementedException();
+            }
+        }
+        
+        public class ChangeTaskEndDate : Query
+        {
+            public override string Alias => "change_enddate_task";
+            protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
+            {
+                throw new NotImplementedException();
+            }
+        }
+        
     }
 }

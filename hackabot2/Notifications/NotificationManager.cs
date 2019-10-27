@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using System.Threading.Tasks;
+using Tasks = System.Threading.Tasks;
 using hackabot.Db.Model;
 using hackabot2.Db.Controllers;
 using Telegram.Bot.Types;
@@ -21,15 +21,21 @@ namespace hackabot.Notifications
             _client = client;
         }
         
-        public async System.Threading.Tasks.Task NotifyDaysLeft(Task task)
+        public async Tasks.Task NotifyDaysLeft(Task task)
         {
             var messageText = $"you have {(task.EndDate.Date - DateTime.Today).Days} left to close task {task.Name}";
             await _client.SendTextMessageAsync(task.AssignedTo, messageText);
         }
 
+        public async Tasks.Task NotifyExpired(Task task)
+        {
+            var messageText = $"you have expired your task {task.Name} for {(DateTime.Today - task.EndDate.Date).Days}, please close it already";
+            await _client.SendTextMessageAsync(task.AssignedTo, messageText);
+        }
+
         public async void Cycle()
         {
-            await System.Threading.Tasks.Task.Run(async () =>
+            await Tasks.Task.Run(async () =>
             {
                 while (true)
                 {
@@ -39,8 +45,12 @@ namespace hackabot.Notifications
                     {
                         await NotifyDaysLeft(task);
                     }
-
-                    await System.Threading.Tasks.Task.Delay(new TimeSpan(1, 0, 0, 0));
+                    foreach (var task in controller.Context.Tasks.Where(task =>
+                        (task.EndDate.Date - DateTime.Today).Days < 0))
+                    {
+                        await NotifyExpired(task);
+                    }
+                    await Tasks.Task.Delay(new TimeSpan(1, 0, 0, 0));
                 }
             });
 

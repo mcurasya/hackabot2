@@ -25,6 +25,12 @@ namespace hackabot.Db.Model
     public enum AccountStatus
     {
         Start,
-        WaitForBoardName
+        WaitForBoardName,
+        WaitForTaskName,
+        WaitingForTaskDescription,
+        WaitingForTaskAssigned,
+        WaitingForTaskEndTime,
+        WaitingForTaskPriority,
+        
     }
 }

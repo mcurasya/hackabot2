@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using hackabot;
 using hackabot.Db.Model;
 using Telegram.Bot.Types;
@@ -137,12 +138,31 @@ namespace hackabot2.Db.Controllers
             return Context.Tasks.Where(task => task.Board == board && task.AssignedTo == user).ToList();
         }
 
-        public String GetStatAboutUserByBoard(Account user, Board board)
+        public string GetStatAboutUserByBoard(Account user, Board board)
         {
             var userTasks = Context.Tasks.Where(task => task.AssignedTo == user && task.Board == board).ToList();
             return $@"current user has {userTasks.Count(task => task.Status != TaskStatus.Done)} assigned tasks, {userTasks.Count(task => task.Status == TaskStatus.Done)} closed tasks, has closed {userTasks.Count(task => task.Status == TaskStatus.Done && task.FinishDate.Date == DateTime.Today)} tasks today.";
         }
 
+        public string GetStatAboutBoard(Board board)
+        {
+            StringBuilder result = new StringBuilder();
+
+            result.Append($"current amount of users on board - {Context.WorkerToBoards.Count(b => b.Board.Id == board.Id)}\n");
+            result.Append($"current amount of TODO tasks - {Context.Tasks.Where(task => task.Board.Id == board.Id).Count(t => t.Status == TaskStatus.TODO)}\n");
+            result.Append($"current amount of tasks in progress - {Context.Tasks.Where(task => task.Board.Id == board.Id).Count(t => t.Status == TaskStatus.InProgress)}\n");
+            result.Append($"current amount of tasks in testing - {Context.Tasks.Where(task => task.Board.Id == board.Id).Count(t => t.Status == TaskStatus.Testing)}\n");
+            result.Append($"current amount of done tasks - {Context.Tasks.Where(task => task.Board.Id == board.Id).Count(t => t.Status == TaskStatus.Done)}\n");
+            result.Append($"today {Context.Tasks.Where(task => task.Board.Id == board.Id).Count(t => t.Status == TaskStatus.Done && t.FinishDate.Date==DateTime.Today)} tasks were done\n");
+            result.Append($"amount of expired tasks - {Context.Tasks.Where(task => task.Board.Id == board.Id).Count(t => t.Status != TaskStatus.Done && t.EndDate.Date > DateTime.Today)}\n");
+            result.Append($"most productive worker today - {} with {} done tasks\n");
+            result.Append($"worker with most expired tasks - {} with {} tasks\n");
+            //todo stats about users
+            return result.ToString();
+        }
+        
+        //todo maybe more statistics 
+        
         #endregion
 
     }
