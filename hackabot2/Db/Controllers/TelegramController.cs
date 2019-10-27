@@ -5,6 +5,7 @@ using System.Text;
 using hackabot;
 using hackabot.Db.Model;
 using Microsoft.EntityFrameworkCore;
+using Monad.Parsec;
 using Telegram.Bot.Types;
 
 namespace hackabot2.Db.Controllers
@@ -21,8 +22,8 @@ namespace hackabot2.Db.Controllers
             Context = new TelegramContext();
             if (First)
             {
-                //Context.Database.EnsureDeleted();
-                //First = false;
+                Context.Database.EnsureDeleted();
+                First = false;
             }
             Context.Database.EnsureCreated();
         }
@@ -119,6 +120,7 @@ namespace hackabot2.Db.Controllers
             SaveChanges();
         }
 
+       
         public void ChangeWorkerAccessLevel(WorkerToBoard worker, AccessLevel accessLevel)
         {
             Context.WorkerToBoards.Find(worker.Id).AccessLevel = accessLevel;
