@@ -64,6 +64,8 @@ namespace hackabot2.Db.Controllers
                 account.ChatId = message.From.Id;
                 account.Controller = this;
                 account.Username = message.From.Username;
+                Context.Accounts.Add(account);
+                SaveChanges();
             }
             if (!Accounts.ContainsKey(account.ChatId))
                 Accounts.Add(account.ChatId, account);
