@@ -23,7 +23,7 @@ namespace hackabot.Notifications
         
         public async Tasks.Task NotifyDaysLeft(Task task)
         {
-            var messageText = $"you have {(task.EndDate.Date - DateTime.Today).Days} left to close task {task.Name}";
+            var messageText = $"you have {(task.EndDate.Date - DateTime.Today).Days} left to close task {task.Name}, keep going, you are still better then @bananchik_pasha";
             await _client.SendTextMessageAsync(task.AssignedTo, messageText);
         }
 
@@ -50,7 +50,7 @@ namespace hackabot.Notifications
                     {
                         await NotifyExpired(task);
                     }
-                    await Tasks.Task.Delay(new TimeSpan(1, 0, 0, 0));
+                    await Tasks.Task.Delay(new TimeSpan(0, 0,1, 0));
                 }
             });
 
