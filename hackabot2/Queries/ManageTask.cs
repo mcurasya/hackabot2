@@ -18,16 +18,22 @@ namespace hackabot.Queries
         {
             var board = account.Controller.GetBoard(int.Parse(values["id"]));
             // buttons.Add();
-            return new Response().EditTextMessage(account, message.Message.MessageId, "todo", new InlineKeyboardMarkup(new InlineKeyboardButton[][]
+            return new Response().EditTextMessage(account, message.Message.MessageId, $@"Board {board.Name} have {board.Tasks?.Count} tasks.", new InlineKeyboardMarkup(new InlineKeyboardButton[][]
             {
                 new InlineKeyboardButton[]
                     {
                         new InlineKeyboardButton()
-                        {
-                            Text = "Create Task",
-                                CallbackData = PackParams("create_task", "id", board.Id.ToString())
+                            {
+                                Text = "Create Task",
+                                    CallbackData = PackParams("create_task", "id", board.Id.ToString())
 
-                        }
+                            },
+                            new InlineKeyboardButton()
+                            {
+                                Text = "Create Task",
+                                    CallbackData = PackParams("create_task", "id", board.Id.ToString())
+
+                            }
                     },
                     new InlineKeyboardButton[]
                     {
@@ -43,7 +49,7 @@ namespace hackabot.Queries
     }
     public class EditTaskQuery : Query
     {
-        public override string Alias { get; } = "manage_tasks";
+        public override string Alias { get; } = "edit_task";
         protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
         {
             var board = account.Controller.GetBoard(int.Parse(values["id"]));
