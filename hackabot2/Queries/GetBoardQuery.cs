@@ -16,7 +16,9 @@ namespace hackabot.Queries
             try
             {
                 var board = account.Controller.GetBoard(boardId);
-                var text = "Here is your tasks:";
+               var text = $@"Board: {board.Name}
+Owner: {board.Owner.Username}
+";
                 return new Response().EditTextMessage(account.ChatId, message.Message.MessageId, text, ManageBoard(board));
             }
             catch (Exception e)
@@ -79,6 +81,17 @@ namespace hackabot.Queries
 
             );
         }
+    }
+    public class GetTaskListQuery : Query
+    {
+        public override string Alias { get; } = "get_task_list";
+        protected override Response Run(CallbackQuery message, Account account, Dictionary<string, string> values)
+        {
+            //aaah i dont know why it does not work
+            int boardId = int.Parse(values["id"]);
+            var board = account.Controller.GetBoards(account).FirstOrDefault(t=>t.Id == boardId);
+            return new Response().EditMessageMarkup(account.ChatId, message.Message.MessageId, BoardButton(board));
+        }
         //this is with taks, not boards
         public static InlineKeyboardMarkup BoardButton(Board board)
         {
@@ -86,7 +99,7 @@ namespace hackabot.Queries
             var input = board.Tasks?.ToArray();
             var keys = new List<List<InlineKeyboardButton>>();
 
-            for (int i = 0; i < input.Length; i++)
+            for (int i = 0; i < input?.Length; i++)
             {
                 var task = input[i];
                 var button =
@@ -111,6 +124,11 @@ namespace hackabot.Queries
                     }
                 }
             }
+            keys.Add(new List<InlineKeyboardButton>{new InlineKeyboardButton
+            {
+                Text = "<<",
+                CallbackData = $"get_board id {board.Id}"
+            }});
             return keys.ToArray();
         }
     }

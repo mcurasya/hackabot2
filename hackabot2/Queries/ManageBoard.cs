@@ -76,7 +76,7 @@ Owner: {board.Owner.Username}
                 new InlineKeyboardButton()
                 {
                     Text = "View tasks",
-                        CallbackData = $"get_task_list id {board.Id}"
+                    CallbackData = PackParams("get_task_list", "id", board.Id.ToString())
                 });
             if (board.Owner == a)
             {
