@@ -69,12 +69,6 @@ Status: {task.Status}
                     Text = "Change status",
                         CallbackData = $"change_status_task {board.Id} {task.Id}"
                 });
-            buttons.Add( //додамо купу полів типу у нас дохуя функціоналу
-                new InlineKeyboardButton()
-                {
-                    Text = "Add note",//what is note???
-                        CallbackData = $"add_note_task {board.Id} {task.Id}"
-                });
             return buttons;
         }
 

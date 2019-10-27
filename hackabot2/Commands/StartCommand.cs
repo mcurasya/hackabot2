@@ -16,7 +16,12 @@ namespace hackabot.Commands
         }
         public override Response Execute(Message message, Client.Client client, Account account)
         {
-            if (message.Text.Length < "/start ".Length) return new Response().TextMessage(account.ChatId, "Hi! You have no boards.\nUse buttons to create new or ask your manager to send you invite link.", Keyboards.CreateBoards(account));
+            if (message.Text.Length < "/start ".Length)
+            {
+                var boards = account.Controller.GetBoards(account);
+                return boards.Length == 0 ? new Response().TextMessage(account.ChatId, "Hi! You have no boards.\nUse buttons to create new or ask your manager to send you invite link.", Keyboards.CreateBoards(account)):
+                    new Response().TextMessage(account.ChatId, "Here is your boards:", Keyboards.BoardsKeyboard(boards));
+            }
 
             var param = message.Text.Substring(7);
             var base64EncodedBytes = Convert.FromBase64String(param);

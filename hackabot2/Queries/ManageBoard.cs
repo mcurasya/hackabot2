@@ -76,7 +76,7 @@ Owner: {board.Owner.Username}
                 new InlineKeyboardButton()
                 {
                     Text = "View tasks",
-                        CallbackData = $"get_task_list {board.Id}"
+                        CallbackData = $"get_task_list id {board.Id}"
                 });
             if (board.Owner == a)
             {
@@ -84,23 +84,23 @@ Owner: {board.Owner.Username}
                     new InlineKeyboardButton()
                     {
                         Text = "Add manager",
-                            CallbackData = $"add_manager {board.Id}"
+                            CallbackData = $"add_manager id {board.Id}"
                     });
                 buttons.Add(new InlineKeyboardButton()
                 {
                     Text = "Change Name",
-                        CallbackData = $"change_name {board.Id}"
+                        CallbackData = $"change_name id {board.Id}"
                 });
                 buttons.Add(new InlineKeyboardButton()
                 {
                     Text = "Create Task",
-                        CallbackData = $"create_task {board.Id}"
+                        CallbackData = $"create_task id {board.Id}"
 
                 });
                 buttons.Add(new InlineKeyboardButton()
                 {
                     Text = "Edit Task",
-                        CallbackData = $"edit_task {board.Id}"
+                        CallbackData = $"edit_task id {board.Id}"
 
                 });
             }
